@@ -241,8 +241,8 @@
     <li id=nmenuid_dm>${tl("暗色主题")}</li>
     <li id=nmenuid_ca>${tl("取消动画")}</li>
     <li id=nmenuid_sd>${tl("显示调试")}</li>
-    <!-- <li id=nmenuid_cu>${tl("检查更新")}</li>
-    <li id=nmenuid_ap>${tl("项目源码")}</li> -->
+    <li id=nmenuid_cu>${tl("检查更新")}</li>
+    <li id=nmenuid_ap>${tl("项目源码")}</li>
     <li id=nmenuid_ab>${tl("关于")}</li>
 </ul>
 `;
