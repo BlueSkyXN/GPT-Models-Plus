@@ -3,25 +3,30 @@
 // @namespace   BlueSkyXN
 // @match       *://chat.openai.com/*
 // @grant       none
-// @version     0.1
+// @version     0.2
 // @author      BlueSkyXN
-// @description https://github.com/BlueSkyXN
+// @description https://github.com/BlueSkyXN/GPT-Models-Plus 用于在ChatGPT 网页版 强制锁定模型，支持GPT3.5/GPT4/GPT3.5M/GPT4M/GPT4B/GPT4P等模型，我是用油猴脚本TamperMonkey加载的
+// @license     GPLv3
+// @warning1    不得用于违法违规用途、不得对任何网站、个人、团体、组织造成损失和其他负面影响，包括中国政府、美国政府、Github/OpenAI/MicroSoft等公司。
+// @warning2    使用了本代码的任何行为后果均由使用者自行承担包括经济、法律、民事刑事等各项责任或损失。
 // ==/UserScript==
 
 (() => {
-    let selectedModel = localStorage.getItem('selectedModel') || 'text-davinci-002-render-sha'
+    let selectedModel = localStorage.getItem('selectedModel') || 'default'
   
     const models = [
-      { value: 'gpt-4', label: 'Use GPT-4' },
-      { value: 'gpt-4-browsing', label: 'Use GPT-4 Browsing' },
-      { value: 'gpt-4-plugins', label: 'Use GPT-4 Plugins' },
-      { value: 'text-davinci-002-render-sha-mobile', label: 'Use Davinci Mobile' },
-      { value: 'gpt-4-mobile', label: 'Use GPT-4 Mobile' }
+      { value: 'default', label: 'Default (No Lock)' },
+      { value: 'text-davinci-002-render-sha', label: 'GPT-3.5' },
+      { value: 'text-davinci-002-render-sha-mobile', label: 'GPT-3.5 Mobile' },
+      { value: 'gpt-4-mobile', label: 'GPT-4 Mobile' },
+      { value: 'gpt-4', label: 'GPT-4' },
+      { value: 'gpt-4-browsing', label: 'GPT-4 Browsing' },
+      { value: 'gpt-4-plugins', label: 'GPT-4 Plugins' }
     ]
   
     const origFetch = window.fetch
     window.fetch = async function (resource, options) {
-      if (resource === "https://chat.openai.com/backend-api/conversation") {
+      if (resource === "https://chat.openai.com/backend-api/conversation" && selectedModel !== 'default') {
         const body = JSON.parse(options.body)
         body.model = selectedModel
         options = { ...options, body: JSON.stringify(body) }
@@ -54,12 +59,12 @@
     container.style.position = 'absolute'
     container.style.top = '10px'
     container.style.right = '20px'
-    container.style.display = 'flex' // 添加这一行
+    container.style.display = 'flex' 
     container.appendChild(label)
     container.appendChild(select)
-    container.style.alignItems = 'center' // 添加这一行
-    label.style.alignSelf = 'center' // 修改这一行
-    label.style.marginRight = '10px' // 添加这一行
+    container.style.alignItems = 'center' 
+    label.style.alignSelf = 'center' 
+    label.style.marginRight = '10px' 
   
   
   
