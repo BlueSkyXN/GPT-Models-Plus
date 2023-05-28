@@ -3,8 +3,6 @@
 
 用于在ChatGPT 网页版 强制锁定模型，支持GPT3.5/GPT4/GPT3.5M/GPT4M/GPT4B/GPT4P等模型
 
-该项目基于 https://github.com/BlueSkyXN/GPT4-Moblie 进行了拓展二开。本项目开发过程中大量应用了AIGC。
-
 ## 功能
 
 该脚本允许用户在OpenAI's ChatGPT页面中选择并锁定使用不同的GPT模型，包括 `GPT-3.5`, `GPT-3.5 Mobile`, `GPT-4 Mobile`, `GPT-4`, `GPT-4 Browsing`, 和 `GPT-4 Plugins`。
@@ -27,17 +25,19 @@
 
 如何知道自己的账号支持哪些模型？请在Chat页面F12后打开网络监测然后重新加载，即可看到一个URL为　[https://chat.openai.com/backend-api/models?history_and_training_disabled=false](https://chat.openai.com/backend-api/models?history_and_training_disabled=false)　的返回值就是一个可用模型的JSON。
 
-JSON内容参考[models.json](https://github.com/BlueSkyXN/GPT4-Moblie/blob/main/models.json)和[models-review.md](https://github.com/BlueSkyXN/GPT4-Moblie/blob/main/models-review.md)。
+JSON内容参考[models.json](models.json)和[models-review.md](models-review.md)。
 
 
 ## 注意事项
 
-此脚本用于学习和研究目的。不得用于违法违规用途、不得对任何网站、个人、团体、组织造成损失和其他负面影响（包括中国政府机关、美国政府机关、Github/OpenAI/MicroSoft等公司）。
+- 使用此脚本时需要注意，因为它会强制锁定新建对话的语言模型。
+- 它可能和其他脚本冲突（同网页的时候，可能效果无效）。如果你发现锁定GPT4M无效，我建议是要么关了其他的，要么去手机App发起新对话然后网页版继续即可。
+- 你需要本身就能在对应浏览器访问对应的ChatGPT模型（比如网络、浏览器、PLUS订阅）
+- 如果你在无痕模式使用则需要注意是否在扩展插件设置中启用了无痕的支持。
+- 不得用于违法违规行为，后果自行承担，和本人无关。
+- 这个脚本可能不会与 OpenAI 的所有更新保持兼容。该方式随时可能会被阻止、封锁等。甚至对你的账号、IP等造成损失，比如被封号等。由此产生的经济损失和法律风险由使用者自行承担。
 
-使用了本代码的任何行为后果均由使用者自行承担包括经济、法律、民事刑事等各项责任或损失。
-
-
-## 版权和许可证
+## 法律、版权和许可证
 
 此项目遵循GPLv3许可证。
 
@@ -49,6 +49,45 @@ OpenAI相关为 https://openai.com/ 网站控制者所有。
 
 If you have an objection to copyright, please submit an issue。
 
+此脚本用于学习和研究目的。不得用于违法违规用途、不得对任何网站、个人、团体、组织造成损失和其他负面影响（包括中国政府机关、美国政府机关、Github/OpenAI/MicroSoft等公司）。
+
+使用了本代码的任何行为后果均由使用者自行承担，包括经济、法律、民事刑事等各项责任或损失。
+
+本核心代码参考了 [NijikaMyWaifu](https://www.reddit.com/r/saraba2nd/comments/13t2329) 的实现，虽然感谢他提供的代码原型，不过由于他的不满意见，下架了原先的GPT4M的镜像项目。
+
+## GPT版本
+
+在 [compare](compare.md)  中，可以注意到截至2023-05-26 HKT，GPT官方在GPT4-Mobile、GPT4-Browser两个环境下，不使用联网模式是不能认知到自己是GPT4模型的，而GPT3.5和GPT4以及进行联网的GPT4-Browser没有这个问题，可以认知到自己的模型版本
+
+## GPT账号、订阅、购买、付费等
+
+### 账号
+
+目前手动注册需要
+1. 邮箱/谷歌苹果微软账号x1，建议邮箱，一旦注册了不可复用，注销也是。
+2. 服务区手机号，不支持虚拟号（尤其是美国、Google Voice）、不支持中国包括大陆香港，支持常见的英国实体手机号。也有人用的什么接码。
+3. 可用的网络、浏览器
+
+### 付费
+
+升级付费需要服务区发行的银行卡（包括借记卡），网关是Stripe，不支持大陆、香港卡，非美国卡失败率也很高，基本都是用美国发行的卡。注意API订阅只能走卡付款。结算方式是月结账单，每月初扣费。
+
+### 订阅
+
+之前只能在网页版购买PLUS，规则是月滚动扣款。后来开通了IOS商店付费。现在在苹果商店US即可付费PLUS订阅（但是API的那种付费不支持）。苹果商店CN和HK别想太多。
+
+苹果US的付费方式主要是 美国卡、美国PayPal、余额。目前余额可以用礼品卡充值没什么难度；美国卡就正常的都行，可以参考我博客；美国PayPal不推荐，目前注册也是要求美国非虚拟号且日常封号，基本不太可能弄。注意没有卡和P时，使用余额可能要求绑定付款方式，原因是你没有使用美国IP。【其他可用区请看下面】
+
+### 购买
+
+账号其实也可以去各类第三方网站购买，这类网站很多，空号基本1-3CNY 一个。
+
+### ChatGPT For IOS 可用区
+2023-05-18 开放 美国
+
+2023-05-25 开放 阿尔巴尼亚、克罗地亚、法国、德国、爱尔兰、牙买加、韩国、新西兰、尼加拉瓜、尼日利亚和英国
+
+2023-05-26 开放 阿尔及利亚、阿根廷、阿塞拜疆、玻利维亚、巴西、加拿大、智利、哥斯达黎加、厄瓜多尔、爱沙尼亚、加纳、印度、伊拉克、以色列、日本、约旦、哈萨克斯坦、科威特、黎巴嫩、立陶宛、毛里塔尼亚、毛里求斯、墨西哥、摩洛哥、纳米比亚、瑙鲁、阿曼、巴基斯坦、秘鲁、波兰、卡塔尔、斯洛文尼亚、突尼斯、阿拉伯联合酋长国 
 
 
 
