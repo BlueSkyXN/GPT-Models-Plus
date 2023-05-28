@@ -50,14 +50,21 @@
       selectedModel = event.target.value
       localStorage.setItem('selectedModel', selectedModel)
     })
+    select.style.padding = '3px 26px 3px 13px'
+    select.style.borderRadius = '6px'
+    select.style.fontSize = '14px'
+    select.style.fontWeight = 500
+    select.style.color = 'black'; // 字体颜色
+    select.style.backgroundColor = 'white'; // 背景颜色
   
     const label = document.createElement('label')
     label.htmlFor = 'modelSelect'
     label.appendChild(document.createTextNode('Model Lock:'))
+    label.style.fontSize = '14px'
   
     const container = document.createElement('div')
     container.style.position = 'absolute'
-    container.style.top = '10px'
+    container.style.top = '6px'
     container.style.right = '20px'
     container.style.display = 'flex' 
     container.appendChild(label)
