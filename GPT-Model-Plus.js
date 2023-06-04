@@ -3,9 +3,9 @@
 // @namespace   BlueSkyXN
 // @match       *://chat.openai.com/*
 // @grant       none
-// @version     0.2
+// @version     0.5
 // @author      BlueSkyXN
-// @description https://github.com/BlueSkyXN/GPT-Models-Plus 用于在ChatGPT 网页版 强制锁定模型，支持GPT3.5/GPT4/GPT3.5M/GPT4M/GPT4B/GPT4P等模型，我是用油猴脚本TamperMonkey加载的
+// @description https://github.com/BlueSkyXN/GPT-Models-Plus 用于在ChatGPT 网页版 强制锁定模型，支持GPT3.5/GPT4/GPT3.5M/GPT4M/GPT4B/GPT4P等模型，用油猴脚本TamperMonkey加载
 // @license     GPLv3
 // @warning1    不得用于违法违规用途、不得对任何网站、个人、团体、组织造成损失和其他负面影响，包括中国政府、美国政府、Github/OpenAI/MicroSoft等公司。
 // @warning2    使用了本代码的任何行为后果均由使用者自行承担，包括经济、法律、民事刑事等各项责任或损失。
