@@ -7,7 +7,7 @@
 
 该脚本允许用户在OpenAI's ChatGPT页面中选择并锁定使用不同的GPT模型，包括 `GPT-3.5`, `GPT-3.5 Mobile`, `GPT-4 Mobile`, `GPT-4`, `GPT-4 Browsing`, 和 `GPT-4 Plugins`。
 
-脚本会在页面上添加一个下拉框（dropdown），用于选择要锁定的模型。选定的模型会被保存在本地，用于之后的聊天会话。
+脚本会在页面上添加一个下拉框（dropdown），用于选择要锁定的模型。选定的模型会被保存在本地，用于之后的聊天会话。（MAX版本还会修改按钮）
 
 ## 使用方式
 
@@ -27,7 +27,6 @@
 
 JSON内容参考[models.json](models.json)和[models-review.md](models-review.md)。
 
-
 ## 注意事项
 
 - 使用此脚本时需要注意，因为它会强制锁定新建对话的语言模型。
@@ -36,6 +35,10 @@ JSON内容参考[models.json](models.json)和[models-review.md](models-review.md
 - 如果你在无痕模式使用则需要注意是否在扩展插件设置中启用了无痕的支持。
 - 不得用于违法违规行为，后果自行承担，和本人无关。
 - 这个脚本可能不会与 OpenAI 的所有更新保持兼容。该方式随时可能会被阻止、封锁等。甚至对你的账号、IP等造成损失，比如被封号等。由此产生的经济损失和法律风险由使用者自行承担。
+
+## Update 更新事宜
+Jun 4, 2023：增加了按钮效果的MAX版本
+Jun 25, 2023：HKT 17:36 ，发现ChatGPT对GPT4M模式增加了RateLimit，以往的对话也一样受到影响，移动端提示你发送了过多的信息给这个模型、网页端提示 “You've reached the current usage cap for GPT-4. You can continue with the default model now, or try again after XXX” 并给了个链接 https://share.hsforms.com/16d0ZZVM3QZirXnCD_q7u1Q4sk30 为了给予每一位Plus用户都有机会尝试该模型，我们目前正在动态调整GPT-4的使用上限，因为我们了解了更多关于需求和系统性能的信息。
 
 ## 法律、版权和许可证
 
