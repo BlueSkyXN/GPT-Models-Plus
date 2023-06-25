@@ -38,6 +38,7 @@ JSON内容参考[models.json](models.json)和[models-review.md](models-review.md
 
 ## Update 更新事宜
 Jun 4, 2023：增加了按钮效果的MAX版本
+
 Jun 25, 2023：HKT 17:36 ，发现ChatGPT对GPT4M模式增加了RateLimit，以往的对话也一样受到影响，移动端提示你发送了过多的信息给这个模型、网页端提示 “You've reached the current usage cap for GPT-4. You can continue with the default model now, or try again after XXX” 并给了个链接 https://share.hsforms.com/16d0ZZVM3QZirXnCD_q7u1Q4sk30 为了给予每一位Plus用户都有机会尝试该模型，我们目前正在动态调整GPT-4的使用上限，因为我们了解了更多关于需求和系统性能的信息。
 
 ## 法律、版权和许可证
