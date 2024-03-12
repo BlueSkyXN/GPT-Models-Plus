@@ -1222,8 +1222,8 @@ nav.flex .transition-all {
 
     /*
     const goodJob = function() {
+        return null
 
-        });
     }
     */
 
