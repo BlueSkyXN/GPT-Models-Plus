@@ -374,7 +374,7 @@
     <li id=nmenuid_dm>${tl("暗色主题")}</li>
     <li id=nmenuid_sd>${tl("显示调试")}</li>
     <li id=nmenuid_cu>${tl("检查更新")}</li>
-    <li id=nmenuid_ap>${tl("赞赏鼓励")}</li>
+    
     <li id=nmenuid_ab>${tl("关于")}</li>
 </ul>
 `;
@@ -517,10 +517,6 @@
             checkForUpdates();
         };
 
-        $('#nmenuid_ap').onclick = function() {
-            supportAuthor();
-        };
-
         $('#nmenuid_ab').onclick = function() {
             window.open(GM_info.script.namespace, '_blank');
         };
@@ -571,16 +567,7 @@
             everChanging(true);
         }
 
-        //检查更新：首次、每3天
-        if (gv("k_lastupdate", 0) === 0 || Date.now() - gv("k_lastupdate", 0) >= 1000 * 60 * 60 * 24 * 3) {
-            sv("k_lastupdate", Date.now());
-            checkForUpdates("auto");
-        }
 
-        if (gv("k_last_support_author", 0) === 0 || Date.now() - gv("k_last_support_author", 0) >= 1000 * 60 * 60 * 24 * 30) {
-            sv("k_last_support_author", Date.now());
-            supportAuthor();
-        }
     };
 
     const toggleMenu = function(action) {
@@ -863,9 +850,7 @@ nav.flex div.overflow-y-auto {
     background: linear-gradient(to right, transparent, #5e5e5e, transparent);
 }
 
-#nmenuid_ap {
-    color: #00bf78;
-}
+
 
 nav.flex .transition-all {
     position: unset;
@@ -1157,13 +1142,7 @@ nav.flex .transition-all {
         }
     };
 
-    const supportAuthor = function() {
-        ndialog(`${tl("赞赏鼓励")}`, `· 本项目由兴趣驱使，提升自己的体验，并共享世界。
-<br>· 如果你喜欢作者的项目，可以给作者一个免费的Star或者Follow。
-<br>· 如果你希望作者的小猫吃到更好的罐头，欢迎赞赏与激励。`, `更多鼓励方式`, function(t) {
-            window.open(`${GM_info.script.namespace}#赞赏`, '_blank');
-        }, `img`, `https://github.com/xcanwin/KeepChatGPT/raw/main/assets/appreciate_wechat.png`);
-    }
+
 
     const interceptTracking = function(action) {
         if (action === true) {
