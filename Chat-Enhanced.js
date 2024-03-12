@@ -1,20 +1,27 @@
 // ==UserScript==
-// @name              Chat-Enhanced
+// @name              KeepChatGPT
 // @description       基于xcanwin/KeepChatGPT项目的优化版本，对部分功能和代码进行了增删改，遵循GPL开源协议。本脚本可以大幅度提升ChatGPT使用体验。
-// @version           0.4
+// @version           24.3
 // @author            BlueSkyXN、xcanwin
 // @namespace         https://github.com/BlueSkyXN/GPT-Models-Plus/
-// @icon              data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" stroke-width="2" fill="none" stroke="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+// @supportURL        https://github.com/BlueSkyXN/GPT-Models-Plus/
+// @icon              data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogPCEtLSBDcmVhdGVkIHdpdGggTWV0aG9kIERyYXcgLSBodHRwOi8vZ2l0aHViLmNvbS9kdW9waXhlbC9NZXRob2QtRHJhdy8gLS0+CiA8Zz4KICA8dGl0bGU+YmFja2dyb3VuZDwvdGl0bGU+CiAgPHJlY3QgZmlsbD0ibm9uZSIgaWQ9ImNhbnZhc19iYWNrZ3JvdW5kIiBoZWlnaHQ9IjQ3IiB3aWR0aD0iNDciIHk9Ii0xIiB4PSItMSIvPgogIDxnIGRpc3BsYXk9Im5vbmUiIG92ZXJmbG93PSJ2aXNpYmxlIiB5PSIwIiB4PSIwIiBoZWlnaHQ9IjEwMCUiIHdpZHRoPSIxMDAlIiBpZD0iY2FudmFzR3JpZCI+CiAgIDxyZWN0IGZpbGw9InVybCgjZ3JpZHBhdHRlcm4pIiBzdHJva2Utd2lkdGg9IjAiIHk9IjAiIHg9IjAiIGhlaWdodD0iMTAwJSIgd2lkdGg9IjEwMCUiLz4KICA8L2c+CiA8L2c+CiA8Zz4KICA8dGl0bGU+TGF5ZXIgMTwvdGl0bGU+CiAgPGltYWdlIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQzBBQUFBdENBTUFBQUFOeEJLb0FBQUFObEJNVkVVQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQ0FnSUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCTHIweWtBQUFBRVhSU1RsTUFJdmZqMXFNNGxHZUN6YnhJZHhXd1ZFcUlTSmdBQUFFdlNVUkJWRWpIemRUYmJvVWdFSVhobVFGQkRoN1crNzlzRWNNR2JOR20yVTM3M2ZySHhHVXlWRVNQRVIvcFlzR2RoVG9NUVBUWEJBQlR5d0dLNld1c3JpKzN3RVFqRTJEL29MWlRaUjlyUVNWdnJ1ZFdyZi9wZ2pNZ094ZDA0R0lYWUtiV0trZ2tnemdpY29KS3JkU0pnb1lsaXpZMmRNSFc2NU1Db0k5R243eGx1ckhoc05FM1RXZ21lbWJieVo1RmVpTysxN2RCY0VkQzIzczg4WmRyb201MEY4VUF3alRHQXBpdVhtbHNiZXZuZC8rd1RtZUR1ZFRHMlptcTJUcFRhdVpVRWdCVGFvZEVjNzJXaVN1MUFkRFdPekpOSjQxc0g5UWJFQllCek90amxnQnNnem9BOW5nUWN4MEJZUXVFUWIwZ2s3V01uQzF0N1p4N2JlSnhtT3ZWU1B4cmsxVDJlenV2UXFRaUJ1Vnp3TC80TCtsVGJYak1kRFVEa0JHY3VMODM5eVpxT0syR3RGYmFVZllCQzNzbUVVWHJITThBQUFBQVNVVk9SSzVDWUlJPSIgaWQ9InN2Z18xIiBoZWlnaHQ9IjQ1IiB3aWR0aD0iNDUiIHk9IjAiIHg9IjAiLz4KIDwvZz4KPC9zdmc+
 // @license           GPLv3
+// @match             *://chat.openai.com
 // @match             *://chat.openai.com/*
+// @connect           raw.githubusercontent.com
+// @connect           greasyfork.org
+// @connect           chat.openai.com
 // @grant             GM_addStyle
 // @grant             GM_addElement
 // @grant             GM_setValue
 // @grant             GM_getValue
+// @grant             GM_xmlhttpRequest
 // @grant             unsafeWindow
-// @run-at            document-idle
+// @run-at            document-body
 // @noframes
 // ==/UserScript==
+
 
 (function() {
     'use strict';
@@ -25,16 +32,18 @@
     const $$ = (Selector, el) => (el || document).querySelectorAll(Selector);
 
     const u = `/api/${GM_info.script.namespace.slice(33, 34)}uth/s${GM_info.script.namespace.slice(28, 29)}ssion`;
-    const symbol1_selector = 'nav.flex .transition-colors';
+    const symbol1_selector = 'nav.flex .mb-1,.pr-2';
     const symbol2_selector = 'button.justify-center .sr-only';
+
+    const datasec_blocklist_default = "18888888888\nhttps://公司域名.com\n银行卡号\n([\\w-]+(\\.[\\w-]+)*)@163\.com\n";
 
     const getLang = function() {
         let lang = `
 {
-    "index": {"暗色主题": "dm", "显示调试": "sd", "取消审计": "cm", "取消动画": "ca", "关于": "ab", "建议间隔30秒": "si", "调整间隔": "mi", "检查更新": "cu", "当前版本": "cv", "发现最新版": "dl", "已是最新版": "lv", "克隆对话": "cc", "净化页面": "pp", "展示大屏": "ls", "展示全屏": "fs", "言无不尽": "sc", "拦截跟踪": "it", "日新月异": "ec", "项目源码": "ap"},
+    "index": {"暗色主题": "dm", "显示调试": "sd", "取消审计": "cm", "取消动画": "ca", "关于": "ab", "建议间隔50秒": "si", "调整间隔": "mi", "检查更新": "cu", "当前版本": "cv", "发现最新版": "dl", "已是最新版": "lv", "克隆对话": "cc", "净化页面": "pp", "展示大屏": "ls", "展示全屏": "fs", "言无不尽": "sc", "拦截跟踪": "it", "日新月异": "ec", "赞赏鼓励": "ap", "警告": "wn", "数据安全": "ds", "发现敏感数据": "dd", "使用正则编写规则": "rr"},
     "local": {
-"en": {"dm": "Dark mode", "sd": "Show debugging", "cm": "Cancel audit", "ca": "Cancel animation", "ab": "About", "si": "Suggest interval of 30 seconds; The author usually sets 150", "mi": "Modify interval", "cu": "Check for updates", "cv": "Current version", "dl": "Discover the latest version", "lv": "is the latest version", "cc": "Conversation cloning", "pp": "Purified page", "ls": "Wide display mode", "fs": "Fullscreen mode", "sc": "Complete response", "it": "Intercept tracking", "ec": "More chat info", "ap": "Source CODE"},
-"zh-CN": {"dm": "暗色主题", "sd": "显示调试", "cm": "取消审计", "ca": "取消动画", "ab": "关于", "si": "建议间隔30秒以上，作者平时设置的是150", "mi": "调整间隔", "cu": "检查更新", "cc": "克隆对话", "pp": "净化页面", "ls": "展示大屏", "fs": "展示全屏", "sc": "言无不尽", "it": "拦截跟踪", "ec": "日新月异", "ap": "项目源码"}
+"zh-CN": {"dm": "暗色主题", "sd": "显示调试", "cm": "取消审计", "ca": "取消动画", "ab": "关于", "si": "建议间隔50秒以上，作者平时设置的是900秒", "mi": "调整间隔", "cu": "检查更新", "cc": "克隆对话", "pp": "净化页面", "ls": "展示大屏", "fs": "展示全屏", "sc": "言无不尽", "it": "拦截跟踪", "ec": "日新月异", "ap": "赞赏鼓励", "wn": "警告", "ds": "数据安全", "dd": "你输入的内容里存在以下敏感数据，已为你自动化脱敏", "rr": "本功能会将聊天输入框里的敏感信息进行脱敏和警告<br>请根据正则表达式语法编写数据安全规则，不同的规则用换行间隔"},
+"zh-TW": {"dm": "暗黑模式", "sd": "顯示調試", "cm": "取消稽核", "ca": "取消動畫", "ab": "關於", "si": "建議間隔50秒，作者平時設置的是900秒", "mi": "調整間隔", "cu": "檢查更新", "cc": "複製對話", "pp": "淨化頁面", "ls": "顯示大螢幕", "fs": "顯示全螢幕", "sc": "言無不盡", "it": "拦截追踪", "ec": "日新月異", "ap": "讚賞鼓勵", "wn": "警告", "ds": "資料安全", "dd": "發現敏感數據", "rr": "使用正則表達式撰寫規則"}
     }
 }
 `;
@@ -82,25 +91,135 @@
         return GM_getValue(key, value);
     };
 
+    class IndexedDB {
+        constructor(dbName, storeName) {
+            this.dbName = dbName;
+            this.storeName = storeName;
+        }
+
+        async open() {
+            return new Promise((resolve, reject) => {
+                const openRequest = indexedDB.open(this.dbName, 1);
+
+                openRequest.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    console.log(db.objectStoreNames, this.storeName);
+                    if (!db.objectStoreNames.contains(this.storeName)) {
+                        const objectStore = db.createObjectStore(this.storeName, {keyPath: 'id'});
+                        objectStore.createIndex('name', 'name', {unique: false});
+                    }
+                }.bind(this);
+
+                openRequest.onsuccess = function(e) {
+                    const db = e.target.result;
+                    resolve(db);
+                };
+
+                openRequest.onerror = function(e) {
+                    reject('Error opening db');
+                };
+            });
+        }
+
+        async operate(operation, item) {
+            const db = await this.open();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(this.storeName, 'readwrite');
+                const store = tx.objectStore(this.storeName);
+                let request;
+
+                switch(operation) {
+                    case 'add':
+                        request = store.add(item);
+                        break;
+                    case 'put':
+                        request = store.put(item);
+                        break;
+                    case 'delete':
+                        request = store.delete(item.id);
+                        break;
+                    default:
+                        db.close();
+                        reject('Invalid operation');
+                        return;
+                }
+
+                request.onsuccess = function() {
+                    resolve(request.result);
+                };
+
+                request.onerror = function() {
+                    reject('Error', request.error);
+                };
+
+                tx.oncomplete = function() {
+                    db.close();
+                };
+            });
+        }
+
+        async operate_get(id) {
+            const db = await this.open();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(this.storeName, 'readonly');
+                const store = tx.objectStore(this.storeName);
+                const request = store.get(id);
+
+                request.onsuccess = function() {
+                    resolve(request.result);
+                };
+
+                request.onerror = function() {
+                    reject('Error', request.error);
+                };
+
+                tx.oncomplete = function() {
+                    db.close();
+                };
+            });
+        }
+
+        async store() {
+            const db = await this.open();
+            const tx = db.transaction(this.storeName, 'readonly');
+            const store = tx.objectStore(this.storeName);
+            return store;
+        }
+
+        async get(id) {
+            return await this.operate_get(id);
+        }
+
+        async add(item) {
+            return await this.operate('add', item);
+        }
+
+        async put(item) {
+            return await this.operate('put', item);
+        }
+
+        async delete(item) {
+            return await this.operate('delete', item);
+        }
+    };
+
     const formatDate = function(d) {
         return (new Date(d)).toLocaleString();
     };
 
-    const formatDate2 = function(datetime) {
-        const Y = datetime.getFullYear();
-        const M = (datetime.getMonth() + 1).toString().padStart(2, '0');
-        const D = datetime.getDate().toString().padStart(2, '0');
-        const h = datetime.getHours().toString().padStart(2, '0');
-        const m = datetime.getMinutes().toString().padStart(2, '0');
+    const formatDate2 = function(dt) {
+        const [Y, M, D, h, m, s] = [dt.getFullYear(), dt.getMonth() + 1, dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds()].map(el => el.toString().padStart(2, '0'));
+        const dtTmp = dt.toLocaleDateString();
         const currentDate = new Date();
+        const currentDateTmp = currentDate.toLocaleDateString();
         let formatted_date;
-        if (currentDate.toISOString().split('T')[0] === (datetime).toISOString().split('T')[0]) {
+        if (dtTmp === currentDateTmp) {
             formatted_date = `${h}:${m}`;
-        } else if (Math.floor(Math.abs(datetime - currentDate) / (24 * 60 * 60 * 1000)) < 6) {
+        } else if (Math.floor(Math.abs((new Date(dtTmp)) - (new Date(currentDateTmp))) / (24 * 60 * 60 * 1000)) < 7) {
             const weekday = language.slice(0, 2) === "zh" ? ['周日', '周一', '周二', '周三', '周四', '周五', '周六'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            formatted_date = weekday[datetime.getDay()];
+            formatted_date = weekday[dt.getDay()];
         } else {
-            formatted_date = `${M}-${D}`;
+            formatted_date = `${M}/${D}`;
         }
         return formatted_date;
     }
@@ -113,6 +232,13 @@
             return d;
         }
     };
+
+    const htmlEncode = function(text) {
+        var tempElement = document.createElement("div");
+        var textNode = document.createTextNode(text);
+        tempElement.appendChild(textNode);
+        return tempElement.innerHTML;
+    }
 
     const setIfr = function(u = "") {
         if ($("#xcanwin") === null) {
@@ -141,7 +267,7 @@
                     console.log(`KeepChatGPT: IFRAME: ERROR: ${e},\nERROR RESPONSE:\n${nIfrText}`);
                 }
             };
-            $("main").lastElementChild.appendChild(nIfr);
+            $("main").firstElementChild.lastElementChild.appendChild(nIfr);
         } else{
             if (u) {
                 $("#xcanwin").src = u;
@@ -150,13 +276,18 @@
     };
 
     const keepChat = function() {
-        fetch(u).then((response) => {
-            response.text().then((data) => {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: u,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            onload: function(response) {
+                const data = response.responseText;
                 try {
-                    const contentType = response.headers.get('Content-Type');
-                    if (contentType.indexOf("application/json") > -1 && response.status !== 403 && data.indexOf(`"expires":"`) > -1) {
+                    if (response.responseHeaders.match(/content-type:\s*application\/json/i) && response.status !== 403 && data.indexOf(`"expires":"`) > -1) {
                         console.log(`KeepChatGPT: FETCH: Expire date: ${formatDate(JSON.parse(data).expires)}`);
-                        $("#xcanwin").contentWindow.document.documentElement.innerHTML = formatJson(data);
+                        //$("#xcanwin").contentWindow.document.documentElement.innerHTML = formatJson(data);
                     } else {
                         setIfr(u);
                     }
@@ -164,51 +295,53 @@
                     console.log(`KeepChatGPT: FETCH: ERROR: ${e},\nERROR RESPONSE:\n${data}`);
                     setIfr(u);
                 }
-            })
+            }
         });
     }
 
     const ncheckbox = function() {
         const nsvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        nsvg.setAttribute("viewBox", "0 0 100 30");
+        nsvg.setAttribute("viewBox", "0 0 45 30");
         nsvg.classList.add("checkbutton");
-        nsvg.innerHTML = `<g fill="none" fill-rule="evenodd"><path fill="#E3E3E3" d="M0 15C0 6.716 6.716 0 15 0h14c8.284 0 15 6.716 15 15s-6.716 15-15 15H15C6.716 30 0 23.284 0 15z"/><circle fill="#FFF" cx="15" cy="15" r="13"/></g>`;
+        nsvg.innerHTML = `<g fill="none" fill-rule="evenodd"><path fill="#979797" d="M0 15C0 6.716 6.716 0 15 0h14c8.284 0 15 6.716 15 15s-6.716 15-15 15H15C6.716 30 0 23.284 0 15z"/><circle fill="#FFF" cx="15" cy="15" r="13"/></g>`;
         return nsvg.cloneNode(true);
     };
 
     const ndialog = function(title = 'KeepChatGPT', content = '', buttonvalue = 'OK', buttonfun = function(t) {return t;}, inputtype = 'br', inputvalue = '') {
         const ndivalert = document.createElement('div');
-        ndivalert.setAttribute("class", "kdialog relative z-50");
         ndivalert.innerHTML = `
-<div class="fixed inset-0 bg-gray-500/90"></div>
-<div class="fixed inset-0 overflow-y-auto z-50" style="display: flex; justify-content: center; align-items: center;">
-  <div class="flex items-end justify-center min-h-full p-4 sm:items-center sm:p-0 text-center">
-    <div class="kdialogwin bg-white dark:bg-gray-900 rounded-lg sm:max-w-lg sm:p-6 text-left">
-      <div class="flex items-center justify-between">
-        <div style="min-width: 15rem">
-          <div class="flex items-center justify-between">
-            <h3 class="dark:text-gray-200 text-gray-900 text-lg">${title}</h3>
-            <p class="kdialogclose" style="cursor: pointer; font-weight: bold; color: #aaa;">X</p>
-          </div>
-          <p class="dark:text-gray-100 mt-2 text-gray-500 text-sm" style="margin-bottom: 0.6rem;">${content}</p>
-          <div class="md:py-3 md:pl-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
-            <${inputtype} class="kdialoginput resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent" style="max-height: 12.5rem; height: 1.5rem; outline: none;" placeholder=""></${inputtype}>
-          </div>
-        </div>
+<div class="fixed inset-0 bg-black/50 dark:bg-gray-600/70">
+  <div class="grid-cols-[10px_1fr_10px] grid h-full w-full grid-rows-[minmax(10px,_1fr)_auto_minmax(10px,_1fr)] md:grid-rows-[minmax(20px,_1fr)_auto_minmax(20px,_1fr)] overflow-y-auto">
+    <div class="relative col-auto col-start-2 row-auto row-start-2 w-full rounded-xl text-left shadow-xl transition-all left-1/2 -translate-x-1/2  bg-token-main-surface-primary max-w-lg xl:max-w-xl">
+      <div class="px-4 pb-4 pt-5 sm:p-6 flex items-center justify-between border-b border-black/10 dark:border-white/10">
+        <h2 class="text-lg leading-6 dark:text-gray-200">${title}</h2>
       </div>
-      <div class="flex sm:flex-row-reverse sm:mt-4"><button class="btn btn-neutral kdialogbtn">${buttonvalue}</button>
+      <div class="p-4 sm:p-6">
+        <p class="kdialogcontent text-muted pb-3 pt-2 text-sm text-gray-600 dark:text-white">${content}</p>
+        <${inputtype} class="kdialoginput w-full resize-none rounded p-4 placeholder:text-gray-300 dark:bg-gray-800 border-gray-100 focus:border-brand-green border"></${inputtype}>
+        <div class="mt-5 flex flex-col gap-3 sm:mt-4 sm:flex-row-reverse">
+          <button class="kdialogbtn btn relative btn-primary">
+            <div class="flex w-full gap-2 items-center justify-center">${buttonvalue}</div>
+          </button>
+          <button class="kdialogclose btn relative btn-neutral">
+            <div class="flex w-full gap-2 items-center justify-center">Cancel</div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
         `;
         if (inputtype === 'br') {
-            $(".kdialoginput", ndivalert).parentElement.style.display = 'none';
+            $(".kdialoginput", ndivalert).style = `display: none`;
+            $(".kdialogcontent", ndivalert).style = `line-height: 2.5;`;
         } else if (inputtype === 'img') {
             $(".kdialoginput", ndivalert).src = inputvalue;
-            $(".kdialoginput", ndivalert).style = `max-height: 19rem; height: unset; display: block; margin: 0 auto;`;
-            $(".kdialogwin", ndivalert).style = `max-width: 37.5rem;`;
-        }else {
+            $(".kdialoginput", ndivalert).style = `max-height: 25rem; height: unset; width: unset; margin: 0 auto;`;
+        } else if (inputtype === 'textarea') {
+            $(".kdialoginput", ndivalert).value = inputvalue;
+            $(".kdialoginput", ndivalert).style = `height: 10rem; background-color: transparent;`;
+        } else {
             $(".kdialoginput", ndivalert).value = inputvalue;
         }
         $(".kdialogclose", ndivalert).onclick = function() {
@@ -230,35 +363,45 @@
         ndivmenu.innerHTML = `
 <ul>
     <li id=nmenuid_af>${tl("调整间隔")}</li>
+    <li id=nmenuid_ds>${tl("数据安全")}</li>
     <li id=nmenuid_cm>${tl("取消审计")}</li>
     <li id=nmenuid_cc>${tl("克隆对话")}</li>
     <li id=nmenuid_sc>${tl("言无不尽")}</li>
     <li id=nmenuid_pp>${tl("净化页面")}</li>
     <li id=nmenuid_ls>${tl("展示大屏")}</li>
-    <li id=nmenuid_fs>${tl("展示全屏")}</li>
     <li id=nmenuid_it>${tl("拦截跟踪")}</li>
     <li id=nmenuid_ec>${tl("日新月异")}</li>
     <li id=nmenuid_dm>${tl("暗色主题")}</li>
-    <li id=nmenuid_ca>${tl("取消动画")}</li>
     <li id=nmenuid_sd>${tl("显示调试")}</li>
     <li id=nmenuid_cu>${tl("检查更新")}</li>
-    <li id=nmenuid_ap>${tl("项目源码")}</li>
+    <li id=nmenuid_ap>${tl("赞赏鼓励")}</li>
     <li id=nmenuid_ab>${tl("关于")}</li>
 </ul>
 `;
-        document.body.appendChild(ndivmenu);
+        $('#kcg').appendChild(ndivmenu);
 
         $('#nmenuid_sd').appendChild(ncheckbox());
         $('#nmenuid_dm').appendChild(ncheckbox());
-        $('#nmenuid_ca').appendChild(ncheckbox());
         $('#nmenuid_cm').appendChild(ncheckbox());
         $('#nmenuid_cc').appendChild(ncheckbox());
         $('#nmenuid_pp').appendChild(ncheckbox());
         $('#nmenuid_ls').appendChild(ncheckbox());
-        $('#nmenuid_fs').appendChild(ncheckbox());
         $('#nmenuid_sc').appendChild(ncheckbox());
         $('#nmenuid_it').appendChild(ncheckbox());
         $('#nmenuid_ec').appendChild(ncheckbox());
+
+        $('#nmenuid_ds').onclick = function() {
+            toggleMenu('hide');
+            ndialog(`${tl("数据安全")}`, `${tl("使用正则编写规则")}`, `Save`, function(t) {
+                let datasecblocklist;
+                try {
+                    datasecblocklist = `${$(".kdialoginput", t).value}\n`.replace(/\r/g,`\n`).replace(/\n+/g, `\n`);
+                } catch (e) {
+                    datasecblocklist = gv("k_datasecblocklist", datasec_blocklist_default);
+                }
+                sv("k_datasecblocklist", datasecblocklist);
+            }, `textarea`, gv("k_datasecblocklist", datasec_blocklist_default));
+        };
 
         $('#nmenuid_sd').onclick = function() {
             if ($('.checkbutton', this).classList.contains('checked')) {
@@ -273,22 +416,12 @@
 
         $('#nmenuid_dm').onclick = function() {
             if ($('.checkbutton', this).classList.contains('checked')) {
-                $('#kcg').style = $('#kcg').styleOrigin;
+                $('body').classList.remove("kdark");
                 sv("k_theme", "light");
             } else {
-                $('#kcg').styleOrigin = $('#kcg').style;
-                $('#kcg').style.background = "#2C3E50";
-                $('#kcg').style.animation = "none";
-                $('#kcg').style.color = "#ffffff";
-                $('#kcg').style.marginRight = "inherit";
+                $('body').classList.add("kdark");
                 sv("k_theme", "dark");
             }
-            $('.checkbutton', this).classList.toggle('checked');
-        };
-
-        $('#nmenuid_ca').onclick = function() {
-            sv("k_cancelAnimation", !$('.checkbutton', this).classList.contains('checked'));
-            $('#kcg').classList.toggle('shine');
             $('.checkbutton', this).classList.toggle('checked');
         };
 
@@ -303,11 +436,11 @@
 
         $('#nmenuid_af').onclick = function() {
             toggleMenu('hide');
-            ndialog(`${tl("调整间隔")}`, `${tl("建议间隔30秒")}`, `Go`, function(t) {
+            ndialog(`${tl("调整间隔")}`, `${tl("建议间隔50秒")}`, `Go`, function(t) {
                 try {
                     interval2Time = parseInt($(".kdialoginput", t).value);
                 } catch (e) {
-                    interval2Time = parseInt(gv("k_interval", 30));
+                    interval2Time = parseInt(gv("k_interval", 50));
                 }
                 if (interval2Time < 10) {
                     return;
@@ -315,7 +448,7 @@
                 clearInterval(nInterval2);
                 nInterval2 = setInterval(nInterval2Fun, 1000 * interval2Time);
                 sv("k_interval", interval2Time);
-            }, `input`, parseInt(gv("k_interval", 30)));
+            }, `input`, parseInt(gv("k_interval", 50)));
         };
 
         $('#nmenuid_cc').onclick = function() {
@@ -344,18 +477,7 @@
             } else {
                 sv("k_largescreen", true);
             }
-            $("#__next>.overflow-hidden.w-full>div.overflow-hidden").classList.toggle('largescreen');
-            $('.checkbutton', this).classList.toggle('checked');
-        };
-
-        $('#nmenuid_fs').onclick = function() {
-            if ($('.checkbutton', this).classList.contains('checked')) {
-                sv("k_fullscreen", false);
-                fullScreen(false);
-            } else {
-                sv("k_fullscreen", true);
-                fullScreen(true);
-            }
+            $("#__next .overflow-hidden.w-full>div.overflow-hidden").classList.toggle('largescreen');
             $('.checkbutton', this).classList.toggle('checked');
         };
 
@@ -382,11 +504,12 @@
         $('#nmenuid_ec').onclick = function() {
             if ($('.checkbutton', this).classList.contains('checked')) {
                 sv("k_everchanging", false);
+                everChanging(false);
             } else {
                 sv("k_everchanging", true);
+                everChanging(true);
             }
             $('.checkbutton', this).classList.toggle('checked');
-            location.reload();
         };
 
         $('#nmenuid_cu').onclick = function() {
@@ -395,10 +518,8 @@
         };
 
         $('#nmenuid_ap').onclick = function() {
-            window.open("https://github.com/BlueSkyXN/GPT-Models-Plus", '_blank');
+            supportAuthor();
         };
-
-
 
         $('#nmenuid_ab').onclick = function() {
             window.open(GM_info.script.namespace, '_blank');
@@ -413,21 +534,9 @@
             $('#xcanwin').style.display = 'none';
         }
 
-        if (gv("k_theme", "light") === "light") {
-            $('#kcg').styleOrigin = $('#kcg').style;
-        } else {
+        if (gv("k_theme", "light") === "dark") {
             $('#nmenuid_dm .checkbutton').classList.add('checked');
-            $('#kcg').style.background = "#2C3E50";
-            $('#kcg').style.animation = "none";
-            $('#kcg').style.color = "#ffffff";
-            $('#kcg').style.marginRight = "inherit";
-        }
-
-        if (gv("k_cancelAnimation", false) === true) {
-            $('#nmenuid_ca .checkbutton').classList.add('checked');
-            $('#kcg').classList.remove('shine');
-        } else {
-            $('#kcg').classList.add('shine');
+            $('body').classList.add("kdark");
         }
 
         if (gv("k_closeModer", false) === true) {
@@ -445,12 +554,7 @@
 
         if (gv("k_largescreen", false) === true) {
             $('#nmenuid_ls .checkbutton').classList.add('checked');
-            $("#__next>.overflow-hidden.w-full>div.overflow-hidden").classList.toggle('largescreen');
-        }
-
-        if (gv("k_fullscreen", false) === true) {
-            $('#nmenuid_fs .checkbutton').classList.add('checked');
-            fullScreen(true);
+            $("#__next .overflow-hidden.w-full>div.overflow-hidden").classList.toggle('largescreen');
         }
 
         if (gv("k_speakcompletely", false) === true) {
@@ -464,19 +568,31 @@
 
         if (gv("k_everchanging", false) === true) {
             $('#nmenuid_ec .checkbutton').classList.add('checked');
+            everChanging(true);
+        }
+
+        //检查更新：首次、每3天
+        if (gv("k_lastupdate", 0) === 0 || Date.now() - gv("k_lastupdate", 0) >= 1000 * 60 * 60 * 24 * 3) {
+            sv("k_lastupdate", Date.now());
+            checkForUpdates("auto");
+        }
+
+        if (gv("k_last_support_author", 0) === 0 || Date.now() - gv("k_last_support_author", 0) >= 1000 * 60 * 60 * 24 * 30) {
+            sv("k_last_support_author", Date.now());
+            supportAuthor();
         }
     };
 
     const toggleMenu = function(action) {
         const ndivmenu = $(".kmenu");
         if (action === "show") {
-            ndivmenu.style.display = 'block';
+            ndivmenu.classList.remove('hide');
             if ($("#kcg")) {
                 ndivmenu.style.left = `${$("#kcg").getBoundingClientRect().right + 20}px`;
                 ndivmenu.style.top = `${$("#kcg").getBoundingClientRect().top}px`;
             }
         } else {
-            ndivmenu.style.display = 'none';
+            ndivmenu.classList.add('hide');
         }
     };
 
@@ -489,50 +605,46 @@
         if (kcg_html !== undefined) {
             if ($(symbol1_selector)) {
                 kcg_html.innerHTML = kcg_html._symbol1_innerHTML;
+                kcg_html.classList.add('kcg-pc');
+                kcg_html.classList.remove('kcg-mb');
                 symbol_prt = findParent($(symbol1_selector), "nav.flex", 3);
             } else if ($(symbol2_selector)) {
                 kcg_html.innerHTML = kcg_html._symbol2_innerHTML;
+                kcg_html.classList.remove('kcg-pc');
+                kcg_html.classList.add('kcg-mb');
                 symbol_prt = findParent($(symbol2_selector), ".sticky", 2);
+                $(symbol2_selector).parentNode.classList.remove('absolute');
             }
             symbol_prt.insertBefore(kcg_html, symbol_prt.childNodes[0]);
             return;
         }
 
-        loadMenu();
         setIfr(u);
 
         const ndivkcg = document.createElement("div");
         ndivkcg.id = "kcg";
-        ndivkcg.setAttribute("class", "kgold shine flex py-3 px-3 items-center gap-3 rounded-md text-sm mb-1 flex-shrink-0 border border-white/20");
+        ndivkcg.setAttribute("class", "flex py-3 px-3 items-center gap-3 rounded-md text-sm mb-1 flex-shrink-0 border border-white/20");
 
-        const ndivmenu = $(".kmenu");
-        ndivkcg.onmouseover = ndivmenu.onmouseover = function() {
-            toggleMenu('show');
-        };
-        ndivkcg.onmouseleave = ndivmenu.onmouseleave = function() {
-            toggleMenu('hide');
-        };
-        ndivkcg.onclick = function() {
-            if (ndivmenu.style.display === 'none') {
-                toggleMenu('show');
-            } else {
-                toggleMenu('hide');
-            }
-        };
         const icon = GM_info.script.icon ? GM_info.script.icon : `${GM_info.script.namespace}raw/main/assets/logo.svg`;
-        //ndivkcg._symbol1_innerHTML = `<img src='${icon}' />Keep${ndivkcg.id.slice(1,2).toUpperCase()}hatGPT by x${ndivkcg.id.slice(1,2)}anwin`;
-        //ndivkcg._symbol2_innerHTML = `Keep${ndivkcg.id.slice(1,2).toUpperCase()}hatGPT`;
-        ndivkcg._symbol1_innerHTML = `<img src='${icon}' />${ndivkcg.id.slice(1,2).toUpperCase()}hatGPT Plus `;
-        ndivkcg._symbol2_innerHTML = `${ndivkcg.id.slice(1,2).toUpperCase()}hatGPT`;
+        ndivkcg._symbol1_innerHTML = `<img src='${icon}' style='width: 1rem;' />Keep${ndivkcg.id.slice(1,2).toUpperCase()}hatGPT by x${ndivkcg.id.slice(1,2)}anwin`;
+        ndivkcg._symbol2_innerHTML = `<img src='${icon}' style='width: 1rem;' />`;
+
         if ($(symbol1_selector)) {
             ndivkcg.innerHTML = ndivkcg._symbol1_innerHTML;
+            ndivkcg.classList.add('kcg-pc');
+            ndivkcg.classList.remove('kcg-mb');
             symbol_prt = findParent($(symbol1_selector), "nav.flex", 3);
         } else if ($(symbol2_selector)) {
             ndivkcg.innerHTML = ndivkcg._symbol2_innerHTML;
+            ndivkcg.classList.remove('kcg-pc');
+            ndivkcg.classList.add('kcg-mb');
             symbol_prt = findParent($(symbol2_selector), ".sticky", 2);
+            $(symbol2_selector).parentNode.classList.remove('absolute');
         }
         kcg_html = ndivkcg;
         symbol_prt.insertBefore(kcg_html, symbol_prt.childNodes[0]);
+        loadMenu();
+        const ndivmenu = $(".kmenu");
 
         addStyle();
         setUserOptions();
@@ -540,50 +652,102 @@
 
     const addStyle = function() {
         GM_addStyle(`
-.kgold {
-    color: #555;
-    background: linear-gradient(to top right, #F0B27A, #FDE184, #F0B27A);
+/*日星月异*/
+.ever-changing {
+    /*左边栏*/
+    nav.flex {
+        background: linear-gradient(to right top, #d0dcff, #f0f0ff, #fff3f3);
+    }
+    nav.flex li>div .bg-gradient-to-l {
+        background-image: unset;
+    }
+
+    /*左边栏选中条目*/
+    nav.flex li>div.bg-token-sidebar-surface-tertiary {
+        background-color: #bfcbfd;
+    }
+    /*左边栏鼠标滑动*/
+    nav.flex li>div:hover {
+        background-color: #d5ddff;
+    }
+
+    nav.flex div.overflow-y-auto h3 {
+        display: none;
+    }
+    nav.flex div.overflow-y-auto .relative.mt-5 {
+        margin-top: 0;
+    }
+
+    /*左边栏日期*/
+    .navdate {
+        font-size: 0.75rem;
+        padding-right: 0.5rem;
+    }
+}
+/*官方暗色模式*/
+.dark {
+    .ever-changing {
+        nav.flex {
+            background: linear-gradient(to right top, #020000, #0f0922, #000);
+        }
+        nav.flex li>div.bg-token-sidebar-surface-tertiary {
+            background-color: #444;
+        }
+        nav.flex li>div:hover {
+            background-color: #2f2f2f;
+        }
+
+        nav.flex li a .navtitle {
+            color: #e1e1e1 !important;
+        }
+    }
+}
+
+/*LOGO*/
+#kcg {
+    background: linear-gradient(to top right, #ff5, #FFE6C6, #F9F9B3);
     animation: gradient 6s ease-in-out infinite;
-    position: relative;
-    overflow: hidden;
+    color: #555;
     font-weight: bold;
     user-select: none;
+    border-color: #cec86b;
 }
 @keyframes gradient {
     0%{background-color:#F0B27A;}
     50%{background-color:#FDE184;}
     100%{background-color:#F0B27A;}
 }
-
-.shine::before {
-    content: '';
+.kcg-pc {
+    position: relative;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+.kcg-mb {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-        to bottom right,
-        rgba(255, 255, 255, 0.3),
-        rgba(255, 255, 255, 0.15),
-        rgba(255, 255, 255, 0)
-    );
-    transform: rotate(-45deg);
-    animation: shine 2.8s linear infinite;
+    margin-top: .3rem;
+    margin-bottom: .3rem;
+    top: 0;
+    left: .5rem;
+    bottom: 0;
 }
-@keyframes shine {
-    from {
-        transform: translateX(-50%) translateY(-50%) rotate(-45deg);
+/*暗色模式*/
+.kdark {
+    #kcg {
+        background: linear-gradient(to top right, #2d005e, #000133, #1600bf);
+        animation: none;
+        color: #ffffff;
+        border-color: #00618e;
     }
-    to {
-        transform: translateX(150%) translateY(150%) rotate(-45deg);
+    #kcg img {
+        filter: invert(1);
     }
 }
 
+/*菜单栏*/
 .kmenu {
-    background-color: #202123;
-    color: #FFFFFF;
-    border: 0.06rem solid #4D4D4F;
+    background: linear-gradient(to top right, #C4F4FF, #E6E6FB, #FFF);
+    color: #000000;
+    border: 0.08rem solid #5252D9;
     border-radius: 0.625rem;
     box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.15);
     display: none;
@@ -591,54 +755,57 @@
     padding: 0.75rem 0;
     position: absolute;
     z-index: 1000;
+    top: .1rem;
+    left: .5rem;
+    right: .5rem;
+    font-weight: normal;
+    font-size: 0.9rem;
+    line-height: normal;
 }
-.kmenu::before {
-    content: "";
-    position: absolute;
-    top: 0rem;
-    bottom: 0rem;
-    left: -6rem;
-    right: 0rem;
-    pointer-events: auto;
-    z-index: -1;
-}
-.kmenu::after {
-    content: "";
-    position: absolute;
-    top: 1rem;
-    left: -1.25rem;
-    border-style: solid;
-    border-width: 0.625rem 0.625rem 0.625rem 0.625rem;
-    border-color: transparent #202123 transparent transparent;
+#kcg:hover .kmenu, .kmenu:hover {
+    display: block;
 }
 .kmenu li {
     display: block;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 0.85rem;
     text-align: left;
     user-select: none;
     display: flex;
     align-items: center;
 }
 .kmenu li:hover {
-    background-color: #273746;
+    background-color: #c0caff;
     cursor: pointer;
+}
+/*暗色模式*/
+.kdark {
+    .kmenu {
+        background: linear-gradient(to top right, #01001c, #09004A, #003193);
+        color: #FFFFFF;
+    }
+    .kmenu li:hover {
+        background-color: #3a3cce;
+    }
 }
 
 main div.items-end>div:first-child {
     user-select: none;
-    max-width: 30px;
+    max-width: 2.25rem !important;
     cursor: pointer;
 }
 
 nav {
     position: relative;
 }
+nav div.pt-3\\.5 {
+    padding-bottom: .5rem;
+    padding-top: .25rem;
+}
 
 .checkbutton {
-    height: 20px;
-    margin-left: auto;
-    margin-right: -35px;
-    padding-left: 10px;
+    height: 1.25rem;
+    right: 0.85rem;
+    position: absolute;
 }
 .checkbutton:hover {
     cursor: pointer;
@@ -651,30 +818,21 @@ nav {
     transition: transform 0.2s ease-in-out;
 }
 
-.largescreen .md\\:max-w-2xl, .largescreen .lg\\:max-w-xl, .largescreen .xl\\:max-w-3xl {
+.largescreen .flex.text-base {
     max-width: unset;
 }
-.largescreen .lg\\:px-0 {
-    padding-left: 25px;
-    padding-right: 50px;
-}
 @media (min-width:1024px) {
+    .largescreen .flex.text-base .lg\\:w-\\[calc\\(100\\%-115px\\)\\] {
+        width: calc(100% - 72px);
+    }
     .largescreen form.stretch {
         max-width: 85%;
     }
 }
-.largescreen div.items-end>div.text-xs {
-    top: -20px;
-    left: -5px;
-    margin-left: unset;
-    -webkit-transform: unset;
-    transform: unset;
-    position: absolute;
+.largescreen img {
+    width: 653px;
 }
 
-.fullscreen {
-    max-width: 0px;
-}
 .btn-neutral {
     cursor: pointer;
 }
@@ -684,20 +842,39 @@ nav {
     max-height: 0 !important;
 }
 
-.navdate {
-    font-size: 0.75rem;
-    padding-right: 0.5rem;
-}
 nav.flex div.overflow-y-auto a.hover\\:pr-4 {
     padding-right: unset;
 }
-nav.flex div.overflow-y-auto{
+nav.flex div.overflow-y-auto {
     scrollbar-width: thin;
+}
+.gptm {
+    position: absolute;
+    top: 1.15rem;
+    left: 0.95rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+}
+.knav li::after {
+    content: "";
+    display: block;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #5e5e5e, transparent);
 }
 
 #nmenuid_ap {
     color: #00bf78;
 }
+
+nav.flex .transition-all {
+    position: unset;
+}
+
+.hide {
+    display: none;
+}
+
 `);
     };
 
@@ -707,93 +884,156 @@ nav.flex div.overflow-y-auto{
                 const fetchReqUrl = argumentsList[0];
                 let fetchRsp;
                 try {
+                    const block_url = 'gravatar\.com|browser-intake-datadoghq\.com|\.wp\.com|intercomcdn\.com|sentry\.io|sentry_key=|intercom\.io|featuregates\.org|/v1/initialize|/messenger/|statsigapi\.net|/rgstr|/v1/sdk_exception';
                     if (gv("k_closeModer", false) && fetchReqUrl.match('/backend-api/moderations(\\?|$)')) {
+                        //取消审计1
                         fetchRsp = Promise.resolve({
                             json: () => {return {}}
                         });
                         return fetchRsp;
                     } else if (gv("k_closeModer", false) && fetchReqUrl.match('/backend-api/conversation(\\?|$)')) {
+                        //取消审计2
                         const post_body = JSON.parse(argumentsList[1].body);
                         post_body.supports_modapi = false;
                         argumentsList[1].body = JSON.stringify(post_body);
-                    } else if (gv("k_intercepttracking", false) && fetchReqUrl.match('sentry\.io|sentry_key=|widget\.intercom\.io|featuregates\.org|/v1/initialize|api-iam\.intercom\.io|/messenger/|nexus-websocket-a\.intercom\.io|statsigapi\.net|/rgstr|/v1/sdk_exception')) {
+                    } else if (gv("k_intercepttracking", false) && fetchReqUrl.match(block_url)) {
+                        //拦截跟踪
+                        console.log(`KeepChatGPT: ${tl("拦截跟踪")}: ${fetchReqUrl}`);
                         fetchRsp = Promise.resolve({
+                        });
+                        return fetchRsp;
+                    } else if (fetchReqUrl.match('/backend-api/compliance')) {
+                        //fix openai bug
+                        fetchRsp = Promise.resolve({
+                            json: () => {return {"registration_country":null,"require_cookie_consent":false,"terms_of_use":{"is_required":false,"display":null},"cookie_consent":null,"age_verification":null}}
                         });
                         return fetchRsp;
                     }
                 } catch (e) {}
                 fetchRsp = target.apply(thisArg, argumentsList);
-                fetchRsp.then(response => {
-                    let clonedResponse = response.clone();
-                    clonedResponse.text().then(fetchRspBody => {
-                        const fetchRspHeaders = clonedResponse.headers;
-                        if (gv("k_everchanging", false) && fetchReqUrl.match('/backend-api/conversations\\?.*offset=')) {
+                return fetchRsp.then(response => {
+                    if (fetchReqUrl.match('/api/auth/session(\\?|$)')) {
+                        //打开网页时，创建数据库。
+                        return response.text().then(async fetchRspBody => {
+                            let fetchRspBodyNew = fetchRspBody;
+                            let modifiedData = JSON.parse(fetchRspBody);
+                            if (!global.st_ec) {
+                                const email = modifiedData.user.email;
+                                global.st_ec = new IndexedDB(`KeepChatGPT_${email}`, 'conversations');
+                            }
+                            delete modifiedData.error; //绕过登录超时 Your session has expired. Please log in again to continue using the app.
+                            fetchRspBodyNew = JSON.stringify(modifiedData);
+                            return Promise.resolve(new Response(fetchRspBodyNew, {status: response.status, statusText: response.statusText, headers: response.headers}));
+                        });
+                    } else if (gv("k_everchanging", false) === true && fetchReqUrl.match('/backend-api/conversations\\?.*offset=')) {
+                        //刷新侧边栏时，更新数据库：id、标题、更新时间。同时更新侧边栏
+                        return response.text().then(async fetchRspBody => {
+                            let fetchRspBodyNew = fetchRspBody;
                             const b = JSON.parse(fetchRspBody).items;
-                            if (!global.kec_object) global.kec_object = {};
-                            b.forEach(el => {
+                            let kec_object = {};
+                            b.forEach(async el => {
                                 const update_time = new Date(el.update_time);
-                                if (global.kec_object[el.id] && global.kec_object[el.id].date && global.kec_object[el.id].update_time >= update_time) return;
-                                global.kec_object[el.id] = {};
-                                global.kec_object[el.id].title = el.title;
-                                global.kec_object[el.id].update_time = update_time;
+                                const ec_tmp = await global.st_ec.get(el.id) || {};
+                                await global.st_ec.put({id: el.id, title: el.title, update_time: update_time, last: ec_tmp.last, model: ec_tmp.model});
+                                kec_object[el.id] = {title: el.title, update_time: update_time, last: ec_tmp.last, model: ec_tmp.model};
                             });
                             setTimeout(function() {
-                                attachDate();
+                                attachDate(kec_object);
+                            }, 1000);//有点bug
+                            return Promise.resolve(new Response(fetchRspBodyNew, {status: response.status, statusText: response.statusText, headers: response.headers}));
+                        });
+                    } else if (gv("k_everchanging", false) === true && fetchReqUrl.match('/backend-api/conversation/')) {
+                        //点击侧边栏的历史对话时，更新数据库：当前id、当前标题、当前更新时间，当前last，当前model。同时更新侧边栏
+                        return response.text().then(async fetchRspBody => {
+                            let fetchRspBodyNew = fetchRspBody;
+                            const f = JSON.parse(fetchRspBody);
+                            const crt_con_id = f && f.conversation_id;
+                            const crt_con_title = f && f.title;
+                            let crt_con_update_time = f && f.update_time;
+                            crt_con_update_time = crt_con_update_time < 10**10 ? crt_con_update_time * 1000 : crt_con_update_time;
+                            crt_con_update_time = new Date(crt_con_update_time);
+                            const crt_con_speak_last_keys = f && f.mapping && Object.keys(f.mapping);
+                            const crt_con_speak_last_id = crt_con_speak_last_keys[crt_con_speak_last_keys.length - 1]
+                            const crt_con_speak_last = f.mapping[crt_con_speak_last_id].message
+                            const crt_con_last = crt_con_speak_last.content.parts[0].trim().replace(/[\r\n]/g, ``).substr(0, 100);
+                            const crt_con_model = crt_con_speak_last.metadata.model_slug;
+                            await global.st_ec.put({id: crt_con_id, title: crt_con_title, update_time: crt_con_update_time, last: crt_con_last, model: crt_con_model});
+                            let kec_object = {};
+                            kec_object[crt_con_id] = {title: crt_con_title, update_time: crt_con_update_time, last: crt_con_last, model: crt_con_model};
+                            setTimeout(function() {
+                                attachDate(kec_object);
                             }, 300);
-                        }
-                    });
-                    return clonedResponse;
-                }).catch(error => {});
-                return fetchRsp;
+                            return Promise.resolve(new Response(fetchRspBodyNew, {status: response.status, statusText: response.statusText, headers: response.headers}));
+                        });
+                    }
+                    return response;
+                }).catch(error => {
+                    console.error(error);
+                    return Promise.reject(error);
+                });
             }
         });
         navigator.sendBeacon = function(url, data) {};
     };
 
-    const everChanging = function() {
-        if (!$('.navdate')) {
+    const everChanging = function(action) {
+        if (action === true) {
+            $('nav.flex')?.classList.add('knav');
+            $("body").classList.add("ever-changing");
             attachDate();
+        } else {
+            $("body").classList.remove("ever-changing");
         }
     };
 
-    const attachDate = function() {
-        if (!global.kec_object) return;
-        $$('nav.flex li a.group').forEach(el => {
+    const attachDate = function(kec_object) {
+        $$('nav.flex li a').forEach(async el => {
             const keyrf = Object.keys(el).find(key => key.startsWith("__reactFiber"));
-            const a_id = el[keyrf].return.return.memoizedProps.id;
-            const title = global.kec_object[a_id].title || "";
-            const update_time = global.kec_object[a_id].update_time || "";
-            if (!title || !update_time) return;
-            if ($('.navtitle', el) && $('.navdate', el)) {
-                $('.navtitle', el).innerHTML = title;
-                $('.navdate', el).innerHTML = formatDate2(update_time);
+            const a_id = el[keyrf].return.return.memoizedProps.conversation.id;
+            let kec_obj_el;
+            if (kec_object) {
+                kec_obj_el = kec_object[a_id];
             } else {
+                kec_obj_el = await global.st_ec.get(a_id);
+            }
+            const title = kec_obj_el && kec_obj_el.title || "";
+            const update_time = kec_obj_el && kec_obj_el.update_time || "";
+            const last = kec_obj_el && kec_obj_el.last || "";
+            const model = kec_obj_el && kec_obj_el.model || "";
+
+            if (!title || !update_time) return;
+            if (!$('.navtitle', el) || !$('.navdate', el) || !$('.navlast', el)) {
                 const cdiv_old = $(`.overflow-hidden`, el);
                 cdiv_old.style.display = "none";
                 const cdiv_new = document.createElement("div");
                 cdiv_new.className = `flex-1 text-ellipsis overflow-hidden break-all relative`;
                 cdiv_new.innerHTML = `
-<div style="max-height: unset; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: absolute;" class="navtitle">
+<div style="max-height: unset; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: absolute; color: #000000; font-weight: bold;" class="navtitle">
     ${title}
 </div>
-<div style="right: 0;position: absolute;color: grey;font-size: 0.75rem;" class="navdate">
+<div style="right: 0; position: absolute; color: gray; font-size: 0.71rem;" class="navdate">
     ${formatDate2(update_time)}
 </div>
 <br>
-<div style="max-height: unset; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: gray; font-size: 0.75rem;">
+<div style="max-height: unset; max-width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #606060; font-size: 0.75rem;" class="navlast">
+    ${htmlEncode(last)}
 </div>
 `;
                 el.insertBefore(cdiv_new, el.childNodes[1]);
+            } else if ($('.navtitle', el).innerHTML !== title || $('.navdate', el).innerHTML !== formatDate2(update_time) || $('.navlast', el).innerHTML !== last) {
+                $('.navtitle', el).innerHTML = title;
+                $('.navdate', el).innerHTML = formatDate2(update_time);
+                $('.navlast', el).innerHTML = htmlEncode(last);
             }
         });
-        $$(`nav.flex div.overflow-y-auto h3`).forEach(el => {
-            el.remove();
-        });
+
         const sidebar_chat = $("nav.flex div.overflow-y-auto");
-        if (sidebar_chat.scrollHeight > sidebar_chat.clientHeight) {
-            sidebar_chat.classList.add("-mr-2");
-        } else {
-            sidebar_chat.classList.remove("-mr-2");
+        if (sidebar_chat) {
+            if (sidebar_chat.scrollHeight > sidebar_chat.clientHeight) {
+                sidebar_chat.classList.add("-mr-2");
+            } else {
+                sidebar_chat.classList.remove("-mr-2");
+            }
         }
     };
 
@@ -806,14 +1046,32 @@ nav.flex div.overflow-y-auto{
         return vi;
     };
 
-    const checkForUpdates = function() {
-        const updateURL = "https://github.com/BlueSkyXN/GPT-Models-Plus";
-        ndialog(`${tl("检查更新")}`, "", `UPDATE`, function(t) {
-            window.open(updateURL, '_blank');
+    const checkForUpdates = function(action = "click") {
+        const downloadURL = GM_info.script.downloadURL;
+        const updateURL = GM_info.scriptUpdateURL || GM_info.script.updateURL || downloadURL;
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `${updateURL}?t=${Date.now()}`,
+            onload: function(response) {
+                const crv = GM_info.script.version;
+                const m = response.responseText.match(/@version\s+(\S+)/);
+                const ltv = m && m[1];
+                if (ltv && verInt(ltv) > verInt(crv)) {
+                    ndialog(`${tl("检查更新")}`, `${tl("当前版本")}: ${crv}, ${tl("发现最新版")}: ${ltv}`, `UPDATE`, function(t) {
+                        window.open(`${downloadURL}?t=${Date.now()}`, '_blank');
+                    });
+                } else {
+                    if (action === "click") {
+                        ndialog(`${tl("检查更新")}`, `${tl("当前版本")}: ${crv}, ${tl("已是最新版")}`, `OK`);
+                    }
+                }
+            }
         });
     };
 
-
+    /*
+    克隆对话
+    */
     const cloneChat = function(action) {
         if (action === true) {
             window.addEventListener('click', cloneChat.listen_Click);
@@ -824,25 +1082,22 @@ nav.flex div.overflow-y-auto{
 
     cloneChat.listen_Click = function(event) {
         const avatarSelector = "main div.items-end>div:first-child";
-        let avatarDiv;
-        if (event.target.matches(avatarSelector)) {
-            avatarDiv = event.target;
-        } else {
-            avatarDiv = findParent(event.target, avatarSelector);
-        }
+        const avatarDiv = findParent(event.target, avatarSelector);
         if (avatarDiv) {
-            if ($('text', avatarDiv) && $('text', avatarDiv).innerHTML === "ChatGPT") {
-                $('text', avatarDiv).remove();
-            }
-            const content = findParent(avatarDiv, "div.text-base", 2).innerText.trim();
+            const contentSelector = ".max-w-full .text-message";
+            const content = $(contentSelector, findParent(avatarDiv, "main div.text-base", 2)).innerText.trim();
             $("form.stretch textarea").value = "";
             $("form.stretch textarea").focus();
             document.execCommand('insertText', false, content);
         }
     };
 
+    /*
+    净化页面
+    */
     const cleanlyHome = function() {
         if (location.href.match(/https:\/\/chat\.openai\.com\/\??/) && gv("k_cleanlyhome", false) === true) {
+            //添加专属logo
             if ($("main h1") && $("main h1").innerText.match(/^ChatGPT(\nPLUS)?$/)) {
                 $("main h1").classList.add('text-gray-200');
                 const nSpan = document.createElement('span');
@@ -850,63 +1105,65 @@ nav.flex div.overflow-y-auto{
                 nSpan.textContent = `KEEP`;
                 $("main h1").appendChild(nSpan);
             }
-            if ($("main h2") && $("main h2").innerText === "Examples") {
-                $("main h2").parentElement.parentElement.remove();
+            //净化首页的快捷提示词
+            if ($('form.stretch .grow .bottom-full')) {
+                $('form.stretch .grow .bottom-full').classList.add('hide');
             }
-            const mainBottom = $("div>span", $("form.stretch").parentElement);
-            if (mainBottom && mainBottom.innerText.indexOf("produce inaccurate") > -1) {
-                mainBottom.remove();
+            //净化底部标签
+            if ($(`main div.text-center>span`) ) {
+                $(`main div.text-center>span`) .classList.add('hide');
             }
-            const utp_svg = $(`nav.flex path[d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"]`);
+            //净化侧边栏的upgrade your plan
+            const utp_svg = $(`nav.flex .border-t .icon-sm.shrink-0`) ;
             if (utp_svg && findParent(utp_svg, `a`, 4)) {
-                findParent(utp_svg, `a`, 4).remove();
-            }
-        }
-    };
-
-    const fullScreen = function(action) {
-        if (action === true) {
-            if ($("#kfull") === null || $('#kfull').style.display === "none") {
-                const ndivkfull = document.createElement("div");
-                ndivkfull.id = "kfull";
-                ndivkfull.setAttribute("class", "btn relative btn-neutral border-0 md:border");
-                ndivkfull.innerHTML = `KEEP`;
-                ndivkfull.onclick = function() {
-                    sv("k_fullscreen", false);
-                    fullScreen(false);
-                    $('#nmenuid_fs .checkbutton').classList.toggle('checked');
-                };
-                const symbol3_selector = `form.stretch .justify-center`;
-                let nInterval3 = setInterval(() => {
-                    if ($(symbol3_selector) && $(symbol2_selector) === null) {
-                        if ($("#kfull") === null) {
-                            $(symbol3_selector).insertBefore(ndivkfull, $(symbol3_selector).childNodes[0]);
-                        } else if ($('#kfull') && $('#kfull').style.display === "none") {
-                            $('#kfull').style.display = '';
-                        }
-                        $("#__next>.overflow-hidden.w-full>div.overflow-x-hidden").classList.add('fullscreen');
-                        clearInterval(nInterval3);
-                    }
-                }, 300);
-            }
-        } else {
-            if ($('#kfull') && $('#kfull').style.display === "") {
-                $('#kfull').style.display = 'none';
-            }
-            if ($("#__next>.overflow-hidden.w-full>div.overflow-x-hidden")) {
-                $("#__next>.overflow-hidden.w-full>div.overflow-x-hidden").classList.remove('fullscreen');
+                findParent(utp_svg, `a`, 4).classList.add('hide');
             }
         }
     };
 
     const speakCompletely = function() {
         if (gv("k_speakcompletely", false) === true) {
-            const continue_svg_selector = `form.stretch .justify-center polygon[points="11 19 2 12 11 5 11 19"]`;
+            const continue_svg_selector = `form.stretch .justify-center polygon[points="11 19 2 12 11 5 11 19"]:not(.ct_clicked)`;
             if ($(continue_svg_selector)) {
-                findParent($(continue_svg_selector), `button`).click();
+                setTimeout(function() {
+                    findParent($(continue_svg_selector), `button`).click();
+                    $(continue_svg_selector).classList.add('ct_clicked');
+                }, 1000);
             }
         }
     };
+
+    const dataSec = function() {
+        if (gv("k_datasecblocklist", datasec_blocklist_default)) {
+            $("form.stretch textarea")?.addEventListener('input', dataSec.listen_input);
+        } else {
+            $("form.stretch textarea")?.removeEventListener('input', dataSec.listen_input);
+        }
+    };
+
+    dataSec.listen_input = function(event) {
+        let ms = [];
+        gv("k_datasecblocklist", datasec_blocklist_default).split(`\n`).forEach(e => {
+            if (e) {
+                const m = $("form.stretch textarea").value.match(e);
+                if (m && m[0]) {
+                    $("form.stretch textarea").value = $("form.stretch textarea").value.replaceAll(m[0], ``);
+                    ms.push(m[0]);
+                }
+            }
+        });
+        if (ms.join(`\n`).trim()) {
+            ndialog(`⚠️${tl("警告")}`, `${tl("发现敏感数据")}`, `Thanks`, function(t) {}, `textarea`, ms.join(`\n`));
+        }
+    };
+
+    const supportAuthor = function() {
+        ndialog(`${tl("赞赏鼓励")}`, `· 本项目由兴趣驱使，提升自己的体验，并共享世界。
+<br>· 如果你喜欢作者的项目，可以给作者一个免费的Star或者Follow。
+<br>· 如果你希望作者的小猫吃到更好的罐头，欢迎赞赏与激励。`, `更多鼓励方式`, function(t) {
+            window.open(`${GM_info.script.namespace}#赞赏`, '_blank');
+        }, `img`, `https://github.com/xcanwin/KeepChatGPT/raw/main/assets/appreciate_wechat.png`);
+    }
 
     const interceptTracking = function(action) {
         if (action === true) {
@@ -941,17 +1198,34 @@ nav.flex div.overflow-y-auto{
         return null;
     };
 
-    $("body").onresize = function() {
-        if ($('#nmenuid_fs .checkbutton')) {
-            if (gv("k_fullscreen", false) === true) {
-                $('#nmenuid_fs .checkbutton').classList.add('checked');
-                fullScreen(true);
-            } else if (gv("k_fullscreen", false) === false) {
-                $('#nmenuid_fs .checkbutton').classList.remove('checked');
-                fullScreen(false);
+    /*
+    fix openai bug
+    帮助openai官方修复bug：Alpha语言环境存在bug导致无法发送信息
+    */
+    const fixOpenaiBUG = function() {
+        localStorage.removeItem('oai/apps/locale');
+        if (gv("k_lastjob", "") === "") {
+            sv("k_lastjob", Date.now().toString() + ",0");
+            goodJob();
+        } else {
+            let d, t;
+            [d, t] = gv("k_lastjob", "").split(",");
+            if (Date.now() - parseInt(d) >= 1000 * 60 * 60 * 24 * 7 && t<=3) {
+                t = parseInt(t) + 1;
+                sv("k_lastjob", Date.now().toString() + "," +t);
+                /*
+                goodJob();
+                */
             }
         }
     };
+
+    /*
+    const goodJob = function() {
+
+        });
+    }
+    */
 
     const nInterval1Fun = function() {
         if ($(symbol1_selector) || $(symbol2_selector)) {
@@ -959,7 +1233,7 @@ nav.flex div.overflow-y-auto{
             setIfr();
             cleanlyHome();
             speakCompletely();
-            everChanging();
+            dataSec();
         }
     };
 
@@ -970,10 +1244,11 @@ nav.flex div.overflow-y-auto{
     };
 
     hookFetch();
+    fixOpenaiBUG();
 
     let nInterval1 = setInterval(nInterval1Fun, 300);
 
-    let interval2Time = parseInt(gv("k_interval", 30));
+    let interval2Time = parseInt(gv("k_interval", 50));
     let nInterval2 = setInterval(nInterval2Fun, 1000 * interval2Time);
 
 })();
