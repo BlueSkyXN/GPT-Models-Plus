@@ -9,6 +9,10 @@
 // @license           GPLv3
 // @match             *://chat.openai.com
 // @match             *://chat.openai.com/*
+// @match             *://chatgpt.com
+// @match             *://chatgpt.com/*
+// @match             *://*.chatgpt.com
+// @match             *://*.chatgpt.com/*
 // @connect           raw.githubusercontent.com
 // @connect           greasyfork.org
 // @connect           chat.openai.com
@@ -374,7 +378,7 @@
     <li id=nmenuid_dm>${tl("暗色主题")}</li>
     <li id=nmenuid_sd>${tl("显示调试")}</li>
     <li id=nmenuid_cu>${tl("检查更新")}</li>
-    
+
     <li id=nmenuid_ab>${tl("关于")}</li>
 </ul>
 `;
