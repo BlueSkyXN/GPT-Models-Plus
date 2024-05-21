@@ -24,6 +24,8 @@
 // @grant             GM_xmlhttpRequest
 // @grant             unsafeWindow
 // @run-at            document-body
+// @downloadURL https://raw.githubusercontent.com/BlueSkyXN/GPT-Models-Plus/main/Chat-Enhanced.js
+// @updateURL https://raw.githubusercontent.com/BlueSkyXN/GPT-Models-Plus/main/Chat-Enhanced.js
 // @noframes
 // ==/UserScript==
 
