@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              KeepChatGPT
 // @description       基于xcanwin/KeepChatGPT项目的优化版本，对部分功能和代码进行了增删改，遵循GPL开源协议。本脚本可以大幅度提升ChatGPT使用体验。
-// @version           24.3
+// @version           28.5
 // @author            BlueSkyXN、xcanwin
 // @namespace         https://github.com/BlueSkyXN/GPT-Models-Plus/
 // @supportURL        https://github.com/BlueSkyXN/GPT-Models-Plus/
@@ -16,6 +16,7 @@
 // @connect           raw.githubusercontent.com
 // @connect           greasyfork.org
 // @connect           chat.openai.com
+// @connect           chatgpt.com
 // @grant             GM_addStyle
 // @grant             GM_addElement
 // @grant             GM_setValue
@@ -39,15 +40,15 @@
     const symbol1_selector = 'nav.flex .mb-1,.pr-2';
     const symbol2_selector = 'button.justify-center .sr-only';
 
-    const datasec_blocklist_default = "18888888888\nhttps://公司域名.com\n银行卡号\n([\\w-]+(\\.[\\w-]+)*)@163\.com\n";
+    const datasec_blocklist_default = "18888888888\nhttps://securiy-domain.com\n([\\w-]+(\\.[\\w-]+)*)@163\.com\nmy-secret-username\n";
 
     const getLang = function() {
         let lang = `
 {
-    "index": {"暗色主题": "dm", "显示调试": "sd", "取消审计": "cm", "取消动画": "ca", "关于": "ab", "建议间隔50秒": "si", "调整间隔": "mi", "检查更新": "cu", "当前版本": "cv", "发现最新版": "dl", "已是最新版": "lv", "克隆对话": "cc", "净化页面": "pp", "展示大屏": "ls", "展示全屏": "fs", "言无不尽": "sc", "拦截跟踪": "it", "日新月异": "ec", "赞赏鼓励": "ap", "警告": "wn", "数据安全": "ds", "发现敏感数据": "dd", "使用正则编写规则": "rr"},
+    "index": {"暗色主题": "dm", "显示调试": "sd", "取消审计": "cm", "取消动画": "ca", "关于": "ab", "建议间隔50秒": "si", "调整间隔": "mi", "检查更新": "cu", "当前版本": "cv", "发现最新版": "dl", "已是最新版": "lv", "克隆对话": "cc", "净化页面": "pp", "展示大屏": "ls", "言无不尽": "sc", "拦截跟踪": "it", "日新月异": "ec", "赞赏鼓励": "ap", "警告": "wn", "数据安全": "ds", "发现敏感数据": "dd", "使用正则编写规则": "rr", "明察秋毫": "ko"},
     "local": {
-"zh-CN": {"dm": "暗色主题", "sd": "显示调试", "cm": "取消审计", "ca": "取消动画", "ab": "关于", "si": "建议间隔50秒以上，作者平时设置的是900秒", "mi": "调整间隔", "cu": "检查更新", "cc": "克隆对话", "pp": "净化页面", "ls": "展示大屏", "fs": "展示全屏", "sc": "言无不尽", "it": "拦截跟踪", "ec": "日新月异", "ap": "赞赏鼓励", "wn": "警告", "ds": "数据安全", "dd": "你输入的内容里存在以下敏感数据，已为你自动化脱敏", "rr": "本功能会将聊天输入框里的敏感信息进行脱敏和警告<br>请根据正则表达式语法编写数据安全规则，不同的规则用换行间隔"},
-"zh-TW": {"dm": "暗黑模式", "sd": "顯示調試", "cm": "取消稽核", "ca": "取消動畫", "ab": "關於", "si": "建議間隔50秒，作者平時設置的是900秒", "mi": "調整間隔", "cu": "檢查更新", "cc": "複製對話", "pp": "淨化頁面", "ls": "顯示大螢幕", "fs": "顯示全螢幕", "sc": "言無不盡", "it": "拦截追踪", "ec": "日新月異", "ap": "讚賞鼓勵", "wn": "警告", "ds": "資料安全", "dd": "發現敏感數據", "rr": "使用正則表達式撰寫規則"}
+"zh-CN": {"dm": "暗色主题", "sd": "显示调试", "cm": "取消审计", "ca": "取消动画", "ab": "关于", "si": "建议间隔50秒以上，作者平时设置的是900秒", "mi": "调整间隔", "cu": "检查更新", "cc": "克隆对话", "pp": "净化页面", "ls": "展示大屏", "sc": "言无不尽", "it": "拦截跟踪", "ec": "日新月异", "ap": "赞赏鼓励", "wn": "警告", "ds": "数据安全", "dd": "你输入的内容里存在以下敏感数据，已为你自动化脱敏", "rr": "本功能会将聊天输入框里的敏感信息进行脱敏和警告<br>请根据正则表达式语法编写数据安全规则，不同的规则用换行间隔", "ko": "明察秋毫"},
+"zh-TW": {"dm": "暗黑模式", "sd": "顯示調試", "cm": "取消稽核", "ca": "取消動畫", "ab": "關於", "si": "建議間隔50秒，作者平時設置的是900秒", "mi": "調整間隔", "cu": "檢查更新", "cc": "複製對話", "pp": "淨化頁面", "ls": "顯示大螢幕", "sc": "言無不盡", "it": "拦截追踪", "ec": "日新月異", "ap": "讚賞鼓勵", "wn": "警告", "ds": "資料安全", "dd": "發現敏感數據", "rr": "使用正則表達式撰寫規則", "ko": "明察秋毫"}
     }
 }
 `;
@@ -369,6 +370,7 @@
     <li id=nmenuid_af>${tl("调整间隔")}</li>
     <li id=nmenuid_ds>${tl("数据安全")}</li>
     <li id=nmenuid_cm>${tl("取消审计")}</li>
+    <li id=nmenuid_ko>${tl("明察秋毫")}</li>
     <li id=nmenuid_cc>${tl("克隆对话")}</li>
     <li id=nmenuid_sc>${tl("言无不尽")}</li>
     <li id=nmenuid_pp>${tl("净化页面")}</li>
@@ -378,21 +380,22 @@
     <li id=nmenuid_dm>${tl("暗色主题")}</li>
     <li id=nmenuid_sd>${tl("显示调试")}</li>
     <li id=nmenuid_cu>${tl("检查更新")}</li>
-
+    <li id=nmenuid_ap>${tl("赞赏鼓励")}</li>
     <li id=nmenuid_ab>${tl("关于")}</li>
 </ul>
 `;
         $('#kcg').appendChild(ndivmenu);
 
-        $('#nmenuid_sd').appendChild(ncheckbox());
-        $('#nmenuid_dm').appendChild(ncheckbox());
         $('#nmenuid_cm').appendChild(ncheckbox());
+        $('#nmenuid_ko').appendChild(ncheckbox());
         $('#nmenuid_cc').appendChild(ncheckbox());
+        $('#nmenuid_sc').appendChild(ncheckbox());
         $('#nmenuid_pp').appendChild(ncheckbox());
         $('#nmenuid_ls').appendChild(ncheckbox());
-        $('#nmenuid_sc').appendChild(ncheckbox());
         $('#nmenuid_it').appendChild(ncheckbox());
         $('#nmenuid_ec').appendChild(ncheckbox());
+        $('#nmenuid_dm').appendChild(ncheckbox());
+        $('#nmenuid_sd').appendChild(ncheckbox());
 
         $('#nmenuid_ds').onclick = function() {
             toggleMenu('hide');
@@ -455,6 +458,17 @@
             }, `input`, parseInt(gv("k_interval", 50)));
         };
 
+        $('#nmenuid_ko').onclick = function() {
+            if ($('.checkbutton', this).classList.contains('checked')) {
+                $('body').classList.remove("kkeenobservation");
+                sv("k_keenObservation", false);
+            } else {
+                $('body').classList.add("kkeenobservation");
+                sv("k_keenObservation", true);
+            }
+            $('.checkbutton', this).classList.toggle('checked');
+        };
+
         $('#nmenuid_cc').onclick = function() {
             if ($('.checkbutton', this).classList.contains('checked')) {
                 sv("k_clonechat", false);
@@ -468,8 +482,11 @@
 
         $('#nmenuid_pp').onclick = function() {
             if ($('.checkbutton', this).classList.contains('checked')) {
+                $('body').classList.remove("kpurifypage");
                 sv("k_cleanlyhome", false);
             } else {
+                $('body').classList.add("kpurifypage");
+                purifyPage();
                 sv("k_cleanlyhome", true);
             }
             $('.checkbutton', this).classList.toggle('checked');
@@ -521,6 +538,10 @@
             checkForUpdates();
         };
 
+        $('#nmenuid_ap').onclick = function() {
+            supportAuthor();
+        };
+
         $('#nmenuid_ab').onclick = function() {
             window.open(GM_info.script.namespace, '_blank');
         };
@@ -543,6 +564,11 @@
             $('#nmenuid_cm .checkbutton').classList.add('checked');
         }
 
+        if (gv("k_keenObservation", true) === true) {
+            $('#nmenuid_ko .checkbutton').classList.add('checked');
+            $('body').classList.add("kkeenobservation");
+        }
+
         if (gv("k_clonechat", false) === true) {
             $('#nmenuid_cc .checkbutton').classList.add('checked');
             cloneChat(true);
@@ -550,6 +576,8 @@
 
         if (gv("k_cleanlyhome", false) === true) {
             $('#nmenuid_pp .checkbutton').classList.add('checked');
+            purifyPage();
+            $('body').classList.add("kpurifypage");
         }
 
         if (gv("k_largescreen", false) === true) {
@@ -571,7 +599,16 @@
             everChanging(true);
         }
 
+        //检查更新：首次、每3天
+        if (gv("k_lastupdate", 0) === 0 || Date.now() - gv("k_lastupdate", 0) >= 1000 * 60 * 60 * 24 * 3) {
+            sv("k_lastupdate", Date.now());
+            checkForUpdates("auto");
+        }
 
+        if (gv("k_last_support_author", 0) === 0 || Date.now() - gv("k_last_support_author", 0) >= 1000 * 60 * 60 * 24 * 30) {
+            sv("k_last_support_author", Date.now());
+            supportAuthor();
+        }
     };
 
     const toggleMenu = function(action) {
@@ -643,6 +680,10 @@
 
     const addStyle = function() {
         GM_addStyle(`
+:root {
+    --keenobservation-background-image-url: '';
+}
+
 /*日星月异*/
 .ever-changing {
     /*左边栏*/
@@ -662,8 +703,14 @@
         background-color: #d5ddff;
     }
 
-    nav.flex div.overflow-y-auto h3 {
-        display: none;
+    /*左边栏新聊天*/
+    nav .sticky.bg-token-sidebar-surface-primary {
+        background-color: unset !important;
+    }
+
+    /*左边栏分类*/
+    nav.flex div.overflow-y-auto .juice\\:sticky  {
+        background-color: unset !important;
     }
     nav.flex div.overflow-y-auto .relative.mt-5 {
         margin-top: 0;
@@ -679,7 +726,7 @@
 .dark {
     .ever-changing {
         nav.flex {
-            background: linear-gradient(to right top, #020000, #0f0922, #000);
+            background: linear-gradient(to right top, #171717, #060606, #171717);
         }
         nav.flex li>div.bg-token-sidebar-surface-tertiary {
             background-color: #444;
@@ -724,7 +771,7 @@
 /*暗色模式*/
 .kdark {
     #kcg {
-        background: linear-gradient(to top right, #2d005e, #000133, #1600bf);
+        background: linear-gradient(to top right, #1a0035, #000, #0c006a);
         animation: none;
         color: #ffffff;
         border-color: #00618e;
@@ -771,19 +818,84 @@
 /*暗色模式*/
 .kdark {
     .kmenu {
-        background: linear-gradient(to top right, #01001c, #09004A, #003193);
+        background: linear-gradient(to top right, #01000f, #00070d, #00194a);
         color: #FFFFFF;
     }
     .kmenu li:hover {
-        background-color: #3a3cce;
+        background-color: #383851;
     }
 }
 
-main div.items-end>div:first-child {
-    user-select: none;
-    max-width: 2.25rem !important;
-    cursor: pointer;
+/*净化页面*/
+.kpurifypage {
+    main .text-token-text-primary .mb-5.font-medium /*游客模式的首页的LOGO下方的问候语*/,
+    form.w-full .grow .bottom-full /*游客模式的首页的快捷提示词*/,
+    nav.flex .mb-4 /*游客模式的侧边栏的登录提醒*/,
+    main .text-token-text-primary .mx-3.items-stretch /*首页的LOGO下方的快捷提示词*/,
+    main div.shadow-xxs /*输入框上方的GPT-4o的上限提示*/,
+    main form .text-token-text-secondary /*输入框上方标签*/,
+    main div.text-center>span /*输入框底部标签*/
+    {
+        display: none;
+    }
 }
+
+/*明察秋毫*/
+.kkeenobservation {
+    /*用户气泡优化*/
+    main div[data-message-author-role="user"] {
+        padding-right: 3rem;
+    }
+    main div[data-message-author-role="user"]>div.w-full>div {
+        background-color: #deedd7;
+    }
+
+    /*添加用户头像*/
+    main div[data-message-author-role="user"]::after {
+        content: '';
+        position: absolute;
+        right: 0rem;
+        width: 2rem;
+        height: 2rem;
+        background-color: gray;
+        background-image: var(--keenobservation-background-image-url);
+        background-size: contain;
+        border-radius: 50%;
+    }
+
+    /*用户气泡下标优化*/
+    main .text-token-text-primary .juice\\:flex-row-reverse .rounded-xl {
+        padding-right: 2.5rem;
+    }
+
+    /*机器人气泡优化*/
+    main div[data-message-author-role="assistant"] {
+        padding-right: 3.5rem;
+    }
+    main div[data-message-author-role="assistant"]>div.w-full {
+        align-items: flex-start;
+    }
+    main div[data-message-author-role="assistant"]>div.w-full>div {
+        width: auto;
+        max-width: 100%;
+        border-radius: 1.5rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        background-color: var(--main-surface-secondary);
+    }
+}
+/*官方暗色模式*/
+.dark {
+    .kkeenobservation {
+        main div[data-message-author-role="user"]>div.w-full>div {
+            background-color: #525452;
+        }
+    }
+}
+
+
 
 nav {
     position: relative;
@@ -809,19 +921,22 @@ nav div.pt-3\\.5 {
     transition: transform 0.2s ease-in-out;
 }
 
-.largescreen .flex.text-base {
-    max-width: unset;
-}
-@media (min-width:1024px) {
-    .largescreen .flex.text-base .lg\\:w-\\[calc\\(100\\%-115px\\)\\] {
-        width: calc(100% - 72px);
+.largescreen {
+    .flex.text-base {
+        max-width: unset;
     }
-    .largescreen form.stretch {
-        max-width: 85%;
+    @media (min-width:1024px) {
+        .flex.text-base .lg\\:w-\\[calc\\(100\\%-115px\\)\\] {
+            width: calc(100% - 72px);
+        }
+        form.w-full {
+            max-width: 85%;
+            margin: auto;
+        }
     }
-}
-.largescreen img {
-    width: 653px;
+    img {
+        width: 653px;
+    }
 }
 
 .btn-neutral {
@@ -854,7 +969,9 @@ nav.flex div.overflow-y-auto {
     background: linear-gradient(to right, transparent, #5e5e5e, transparent);
 }
 
-
+#nmenuid_ap {
+    color: #00bf78;
+}
 
 nav.flex .transition-all {
     position: unset;
@@ -901,17 +1018,20 @@ nav.flex .transition-all {
                 } catch (e) {}
                 fetchRsp = target.apply(thisArg, argumentsList);
                 return fetchRsp.then(response => {
-                    if (fetchReqUrl.match('/api/auth/session(\\?|$)')) {
+                    if (fetchReqUrl.match('/backend-api/me(\\?|$)')) {
                         //打开网页时，创建数据库。
                         return response.text().then(async fetchRspBody => {
                             let fetchRspBodyNew = fetchRspBody;
-                            let modifiedData = JSON.parse(fetchRspBody);
-                            if (!global.st_ec) {
-                                const email = modifiedData.user.email;
-                                global.st_ec = new IndexedDB(`KeepChatGPT_${email}`, 'conversations');
+                            if (fetchRspBodyNew !== "{}"){ //当前已登录
+                                let modifiedData = JSON.parse(fetchRspBody);
+                                document.documentElement.style.setProperty('--keenobservation-background-image-url', `url('${modifiedData.picture}')`); //更新明察秋毫头像
+                                if (!global.st_ec) {
+                                    const email = modifiedData.email;
+                                    global.st_ec = new IndexedDB(`KeepChatGPT_${email}`, 'conversations');
+                                }
+                                delete modifiedData.error; //绕过登录超时 Your session has expired. Please log in again to continue using the app.
+                                fetchRspBodyNew = JSON.stringify(modifiedData);
                             }
-                            delete modifiedData.error; //绕过登录超时 Your session has expired. Please log in again to continue using the app.
-                            fetchRspBodyNew = JSON.stringify(modifiedData);
                             return Promise.resolve(new Response(fetchRspBodyNew, {status: response.status, statusText: response.statusText, headers: response.headers}));
                         });
                     } else if (gv("k_everchanging", false) === true && fetchReqUrl.match('/backend-api/conversations\\?.*offset=')) {
@@ -957,7 +1077,7 @@ nav.flex .transition-all {
                     }
                     return response;
                 }).catch(error => {
-                    console.error(error);
+                    //console.error(error);
                     return Promise.reject(error);
                 });
             }
@@ -1062,6 +1182,7 @@ nav.flex .transition-all {
     克隆对话
     */
     const cloneChat = function(action) {
+        cloneChat.firstTarget = null;
         if (action === true) {
             window.addEventListener('click', cloneChat.listen_Click);
         } else {
@@ -1070,22 +1191,32 @@ nav.flex .transition-all {
     };
 
     cloneChat.listen_Click = function(event) {
-        const avatarSelector = "main div.items-end>div:first-child";
-        const avatarDiv = findParent(event.target, avatarSelector);
+        const avatarSelector = "main .text-sm.flex-col>.text-token-text-primary .mx-auto>div:first-child";
+        const avatarDiv = findParent(event.target, avatarSelector, 10);
         if (avatarDiv) {
-            const contentSelector = ".max-w-full .text-message";
-            const content = $(contentSelector, findParent(avatarDiv, "main div.text-base", 2)).innerText.trim();
-            $("form.stretch textarea").value = "";
-            $("form.stretch textarea").focus();
-            document.execCommand('insertText', false, content);
+            const selectionText = window.getSelection().toString();
+            if (selectionText.length === 0) { //未选中文本时
+                if (!cloneChat.firstTarget || (cloneChat.firstTarget && cloneChat.firstTarget !== avatarDiv)){ //普通单击时执行克隆，以及选中文本时记录的选中元素与当前单击元素不同时执行克隆
+                    const contentSelector = ".max-w-full .text-message";
+                    const content = $(contentSelector, findParent(avatarDiv, "main .text-sm.flex-col>.text-token-text-primary .mx-auto", 2)).innerText.trim();
+                    $("form.w-full textarea").value = "";
+                    $("form.w-full textarea").focus();
+                    document.execCommand('insertText', false, content);
+                }
+                cloneChat.firstTarget = null;
+            } else { //选中文本时记录选中元素
+                cloneChat.firstTarget = avatarDiv;
+            }
+        } else {
+            cloneChat.firstTarget = null;
         }
     };
 
     /*
     净化页面
     */
-    const cleanlyHome = function() {
-        if (location.href.match(/https:\/\/chat\.openai\.com\/\??/) && gv("k_cleanlyhome", false) === true) {
+    const purifyPage = function() {
+        if (location.href.match(/https:\/\/(chatgpt\.com|chat\.openai\.com)\/\??/)) {
             //添加专属logo
             if ($("main h1") && $("main h1").innerText.match(/^ChatGPT(\nPLUS)?$/)) {
                 $("main h1").classList.add('text-gray-200');
@@ -1094,29 +1225,16 @@ nav.flex .transition-all {
                 nSpan.textContent = `KEEP`;
                 $("main h1").appendChild(nSpan);
             }
-            //净化首页的快捷提示词
-            if ($('form.stretch .grow .bottom-full')) {
-                $('form.stretch .grow .bottom-full').classList.add('hide');
-            }
-            //净化底部标签
-            if ($(`main div.text-center>span`) ) {
-                $(`main div.text-center>span`) .classList.add('hide');
-            }
-            //净化侧边栏的upgrade your plan
-            const utp_svg = $(`nav.flex .border-t .icon-sm.shrink-0`) ;
-            if (utp_svg && findParent(utp_svg, `a`, 4)) {
-                findParent(utp_svg, `a`, 4).classList.add('hide');
-            }
         }
     };
 
     const speakCompletely = function() {
         if (gv("k_speakcompletely", false) === true) {
-            const continue_svg_selector = `form.stretch .justify-center polygon[points="11 19 2 12 11 5 11 19"]:not(.ct_clicked)`;
+            const continue_svg_selector = `form.w-full .justify-center svg path[d*="0-13.09-5H9a1 1 0 0 1 0 2H4.472a1 1 0 0 1-1-1.024V3.5a1 1 0 0 1 1-1"]:not(.ct_clicked)`;
             if ($(continue_svg_selector)) {
                 setTimeout(function() {
-                    findParent($(continue_svg_selector), `button`).click();
-                    $(continue_svg_selector).classList.add('ct_clicked');
+                    findParent($(continue_svg_selector), `button`)?.click();
+                    $(continue_svg_selector)?.classList.add('ct_clicked');
                 }, 1000);
             }
         }
@@ -1124,9 +1242,9 @@ nav.flex .transition-all {
 
     const dataSec = function() {
         if (gv("k_datasecblocklist", datasec_blocklist_default)) {
-            $("form.stretch textarea")?.addEventListener('input', dataSec.listen_input);
+            $("form.w-full textarea")?.addEventListener('input', dataSec.listen_input);
         } else {
-            $("form.stretch textarea")?.removeEventListener('input', dataSec.listen_input);
+            $("form.w-full textarea")?.removeEventListener('input', dataSec.listen_input);
         }
     };
 
@@ -1134,9 +1252,9 @@ nav.flex .transition-all {
         let ms = [];
         gv("k_datasecblocklist", datasec_blocklist_default).split(`\n`).forEach(e => {
             if (e) {
-                const m = $("form.stretch textarea").value.match(e);
+                const m = $("form.w-full textarea").value.match(e);
                 if (m && m[0]) {
-                    $("form.stretch textarea").value = $("form.stretch textarea").value.replaceAll(m[0], ``);
+                    $("form.w-full textarea").value = $("form.w-full textarea").value.replaceAll(m[0], ``);
                     ms.push(m[0]);
                 }
             }
@@ -1146,7 +1264,13 @@ nav.flex .transition-all {
         }
     };
 
-
+    const supportAuthor = function() {
+        ndialog(`${tl("赞赏鼓励")}`, `· 本项目由兴趣驱使，提升自己的体验，并共享世界。
+<br>· 如果你喜欢作者的项目，可以给作者一个免费的Star或者Follow。
+<br>· 如果你希望作者的小猫吃到更好的罐头，欢迎赞赏与激励。`, `更多鼓励方式`, function(t) {
+            window.open(`${GM_info.script.namespace}#赞赏`, '_blank');
+        }, `img`, `https://github.com/xcanwin/KeepChatGPT/raw/main/assets/appreciate_wechat.png`);
+    }
 
     const interceptTracking = function(action) {
         if (action === true) {
@@ -1189,32 +1313,20 @@ nav.flex .transition-all {
         localStorage.removeItem('oai/apps/locale');
         if (gv("k_lastjob", "") === "") {
             sv("k_lastjob", Date.now().toString() + ",0");
-            goodJob();
         } else {
             let d, t;
             [d, t] = gv("k_lastjob", "").split(",");
             if (Date.now() - parseInt(d) >= 1000 * 60 * 60 * 24 * 7 && t<=3) {
                 t = parseInt(t) + 1;
                 sv("k_lastjob", Date.now().toString() + "," +t);
-                /*
-                goodJob();
-                */
             }
         }
     };
-
-    /*
-    const goodJob = function() {
-        return null
-
-    }
-    */
 
     const nInterval1Fun = function() {
         if ($(symbol1_selector) || $(symbol2_selector)) {
             loadKCG();
             setIfr();
-            cleanlyHome();
             speakCompletely();
             dataSec();
         }
@@ -1227,7 +1339,7 @@ nav.flex .transition-all {
     };
 
     hookFetch();
-    fixOpenaiBUG();
+    //fixOpenaiBUG();
 
     let nInterval1 = setInterval(nInterval1Fun, 300);
 
