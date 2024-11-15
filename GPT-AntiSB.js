@@ -18,18 +18,6 @@
 
 (function() {
     'use strict';
-    Object.defineProperty(navigator, 'platform', {
-        get: function() {
-            return 'iOS';
-        },
-        configurable: true
-    });
-    Object.defineProperty(navigator, 'userAgent', {
-        get: function() {
-            return 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_0 like Mac OS X) ' +
-                   'AppleWebKit/605.1.15 (KHTML, like Gecko) ' +
-                   'CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1';
-        },
-        configurable: true
-    });
-})();
+    Object.defineProperty(navigator,'platform',{get:function(){return 'iOS';}});
+    Object.defineProperty(navigator,'userAgent',{get:function(){return 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_2_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1';}});
+})(); 
