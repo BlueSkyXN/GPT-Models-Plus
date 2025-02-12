@@ -1,27 +1,23 @@
 // ==UserScript==
-// @name        Claude helper (对话导出\字数统计\时间显示)
-// @name:zh-CN  Claude 助手 (对话导出\字数统计\时间显示)
-// @version      0.6.8
+// @name        Claude helper
+// @name:zh-CN  Claude 助手
+// @version      1.0.0
 // @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。
-// @author       Yearly
+// @author       BlueSKyXN
 // @match        https://claude.ai/*
 // @include      https://*claude*.com/*
-// @match        https://chat.kelaode.ai/*
-// @match        https://lobe.aicnn.xyz/*
-// @match        https://claude.asia/*
-// @include      https://*claude*.cc/*
 // @icon         data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg4MHY4MEgweiIgZmlsbD0iIzQ0NSIvPjxwYXRoIGQ9Im0zMyA0NC0yMy0xYy0xIDAtMi0yLTItM3MwLTEgMS0xbDI0IDItMjEtMTVjMC0xLTEtMS0xLTNzMy00IDYtMmwxNCAxMi05LTE3di0yYzAtMSAxLTUgMy01IDEgMCAzIDAgNCAxbDExIDIzIDItMjBjMC0yIDEtNCAzLTRzMyAxIDMgMmwtMyAyMCAxMi0xNGMxLTEgMy0yIDQtMSAyIDIgMiA0IDEgNkw1MSAzN2gxbDEyLTJjMy0xIDYtMiA3IDAgMSAxIDAgMyAwIDNsLTIxIDVjMTQgMSAxNSAwIDE4IDEgMiAwIDMgMiAzIDMgMCAzLTIgMy0zIDNsLTE5LTQgMTUgMTR2MWwtMiAxYy0xIDAtOS03LTE0LTExbDcgMTFjMSAxIDEgMyAwIDRzLTMgMS0zIDBMNDEgNTBjMCA3LTEgMTMtMiAxOSAwIDEtMSAxLTMgMi0xIDAtMy0xLTItM2wxLTQgMy0xNi0xMCAxMy00IDVoLTFjLTEgMC0yLTEtMi0zbDE0LTE4LTE3IDExaC00cy0xLTIgMC0zbDUtNHoiIGZpbGw9IiNENzUiLz48L3N2Zz4=
 // @license      AGPL-v3.0
-// @namespace    https://greasyfork.org/zh-CN/scripts/502829-claude-helper
-// @supportURL   https://greasyfork.org/zh-CN/scripts/502829-claude-helper
-// @homepageURL  https://greasyfork.org/zh-CN/scripts/502829-claude-helper
+// @namespace    https://github.com/BlueSkyXN/GPT-Models-Plus
+// @supportURL   https://github.com/BlueSkyXN/GPT-Models-Plus
+// @homepageURL  https://github.com/BlueSkyXN/GPT-Models-Plus
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand
 // @grant        GM_download
 // @noframes
-// @downloadURL https://update.greasyfork.org/scripts/502829/Claude%20helper%20%28%E5%AF%B9%E8%AF%9D%E5%AF%BC%E5%87%BA%5C%E5%AD%97%E6%95%B0%E7%BB%9F%E8%AE%A1%5C%E6%97%B6%E9%97%B4%E6%98%BE%E7%A4%BA%29.user.js
-// @updateURL https://update.greasyfork.org/scripts/502829/Claude%20helper%20%28%E5%AF%B9%E8%AF%9D%E5%AF%BC%E5%87%BA%5C%E5%AD%97%E6%95%B0%E7%BB%9F%E8%AE%A1%5C%E6%97%B6%E9%97%B4%E6%98%BE%E7%A4%BA%29.meta.js
+// @downloadURL https://github.com/BlueSkyXN/GPT-Models-Plus/blob/main/ClaudeHelper.js
+// @updateURL https://github.com/BlueSkyXN/GPT-Models-Plus/blob/main/ClaudeHelper.js
 // ==/UserScript==
 
 (function() {
@@ -74,25 +70,25 @@
   // 计算对话成本的函数
   function calculateConversationCost(model, inTokens, outTokens) {
     if (!model) {
-        console.warn('模型名称为空');
-        return null;
+      console.warn('模型名称为空');
+      return null;
     }
 
     const modelLower = model.toLowerCase();
     let inRate, outRate;
 
     if (modelLower.includes("sonnet")) {
-        inRate = 3;
-        outRate = 15;
+      inRate = 3;
+      outRate = 15;
     } else if (modelLower.includes("haiku")) {
-        inRate = 0.8;
-        outRate = 4;
+      inRate = 0.8;
+      outRate = 4;
     } else if (modelLower.includes("opus")) {
-        inRate = 15;
-        outRate = 75;
+      inRate = 15;
+      outRate = 75;
     } else {
-        console.warn('未识别的模型:', model);
-        return null;
+      console.warn('未识别的模型:', model);
+      return null;
     }
 
     const inCost = (inTokens / 1_000_000) * inRate;
@@ -192,56 +188,46 @@
 
   function msg_counter_main() {
     let fieldset = document.querySelector("body > div.flex.min-h-screen.w-full fieldset") ||
-        document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full> div.relative.mx-auto.flex.h-full.w-full > div.sticky.bottom-0.mx-auto.w-full");
+      document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full> div.relative.mx-auto.flex.h-full.w-full > div.sticky.bottom-0.mx-auto.w-full");
 
     if (fieldset) {
-        let ret = get_msg_count();
-        if (!ret) return;
+      let ret = get_msg_count();
+      if (!ret) return;
 
-        let count_result = document.querySelector("#claude-msg-counter");
-        if (!count_result) {
-            count_result = document.createElement("pre");
-            count_result.id = "claude-msg-counter";
-            count_result.className = "border-0.5 relative z-[5] text-text-200 border-accent-pro-100/20 bg-accent-pro-900 rounded-t-xl border-b-0";
-            count_result.style = "font-size:12px; padding: 5px 7px 14px; margin: -3px 0px -12px; text-wrap: pretty; z-index: 6;";
+      let count_result = document.querySelector("#claude-msg-counter");
+      if (!count_result) {
+        count_result = document.createElement("pre");
+        count_result.id = "claude-msg-counter";
+        count_result.className = "border-0.5 relative z-[5] text-text-200 border-accent-pro-100/20 bg-accent-pro-900 rounded-t-xl border-b-0";
+        count_result.style = "font-size:12px; padding: 5px 7px 8px; margin: -3px 0px -7px; text-wrap: pretty; z-index: 6;"; // 调整padding和margin
 
-            let targetParent = fieldset.querySelector("div.flex.md\\:px-2.flex-col-reverse");
-            if (targetParent) {
-                targetParent.insertBefore(count_result, targetParent.firstChild);
-            } else if (fieldset.querySelector("div.flex.w-full.flex-col.items-center")) {
-                fieldset.querySelector("div.flex.w-full.flex-col.items-center").before(count_result);
-            }
+        let targetParent = fieldset.querySelector("div.flex.md\\:px-2.flex-col-reverse");
+        if (targetParent) {
+          targetParent.insertBefore(count_result, targetParent.firstChild);
+        } else if (fieldset.querySelector("div.flex.w-full.flex-col.items-center")) {
+          fieldset.querySelector("div.flex.w-full.flex-col.items-center").before(count_result);
         }
+      }
 
-        let all_length = ret.tx_sz + ret.rx_sz;
-        let file_info = ret.fp_cnts ? `,${ret.fp_cnts}个附件(${ret.fp_sz}字)` : '';
-        let img_info = ret.img_cnts ? `,${ret.img_cnts}个媒体文件` : '';
-        const totalToken = conversation_tokensSoFar();
-        let token_info = totalToken ? `|【Token】:${totalToken}` : '';
+      let all_length = ret.tx_sz + ret.rx_sz;
+      let file_info = ret.fp_cnts ? `, ${ret.fp_cnts}个附件(${ret.fp_sz}字)` : '';
+      let img_info = ret.img_cnts ? `, ${ret.img_cnts}个媒体文件` : '';
+      const totalToken = conversation_tokensSoFar();
+      const model = conversation_model(); // 获取模型名称
 
-        // 计算 cost (关键部分)
-        const model = conversation_model();
-        let cost_info = '';
+      let inTokens = 0, outTokens = 0; // 初始化
+      if (totalToken && all_length > 0) {
+        inTokens = totalToken * (ret.tx_sz / all_length);
+        outTokens = totalToken * (ret.rx_sz / all_length);
+      }
+      const conversationCost = (model && totalToken) ? calculateConversationCost(model, inTokens, outTokens) : null; // 确保模型和token存在
 
-        if (model && totalToken) {
-            let inTokens, outTokens;
-            if (all_length > 0) {
-                // 按字数比例分配 token
-                inTokens = totalToken * (ret.tx_sz / all_length);
-                outTokens = totalToken * (ret.rx_sz / all_length);
-            } else {
-                // 如果总字数为 0，则 token 也都为 0
-                inTokens = 0;
-                outTokens = 0;
-            }
+      let cost_info = conversationCost ? `|【Cost】:USD ${conversationCost}` : '';
+      let model_info = model ? ` (${model})` : ''; // 模型信息
 
-            const conversationCost = calculateConversationCost(model, inTokens, outTokens);
-            cost_info = conversationCost ? `|【Cost】:USD ${conversationCost}` : '';
-        }
-
-        count_result.innerText = `【统计】已发:${ret.tx_cnts}条,${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条,${ret.rx_sz}字|合计:${all_length}字${token_info}${cost_info}`;
+      count_result.innerText = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字\n【Token】:${totalToken}${cost_info}${model_info}`;
     }
-}
+  }
   setInterval(() => {
     msg_counter_main();
   }, 1600);
