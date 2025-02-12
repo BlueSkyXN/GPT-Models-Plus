@@ -71,6 +71,35 @@
     .hidden.flex-row-reverse { display: flex; }
   `);
 
+  // 计算对话成本的函数
+  function calculateConversationCost(model, inTokens, outTokens) {
+    if (!model) {
+        console.warn('模型名称为空');
+        return null;
+    }
+
+    const modelLower = model.toLowerCase();
+    let inRate, outRate;
+
+    if (modelLower.includes("sonnet")) {
+        inRate = 3;
+        outRate = 15;
+    } else if (modelLower.includes("haiku")) {
+        inRate = 0.8;
+        outRate = 4;
+    } else if (modelLower.includes("opus")) {
+        inRate = 15;
+        outRate = 75;
+    } else {
+        console.warn('未识别的模型:', model);
+        return null;
+    }
+
+    const inCost = (inTokens / 1_000_000) * inRate;
+    const outCost = (outTokens / 1_000_000) * outRate;
+    return (inCost + outCost).toFixed(4);
+  }
+
   // model info
   function conversation_model() {
     let conversation = document.querySelector("body > div.flex.min-h-screen.w-full > div > div.flex.h-screen") ;
@@ -118,81 +147,101 @@
 
   // msg count
   var last_uuid = '', last_length = 0;
+
+  // 获取消息计数的函数 (移除 tx_tokens, rx_tokens)
   function get_msg_count() {
-    let mainScreen = document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full > div.relative.mx-auto.flex");
-    if(!mainScreen) return;
+      let mainScreen = document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full > div.relative.mx-auto.flex");
+      if (!mainScreen) return;
 
-    let tx_cnts = 0, tx_sz = 0;
-    let rx_cnts = 0, rx_sz = 0;
-    let fp_cnts = 0, fp_sz = 0, img_cnts = 0;
-    let i = 0;
+      let tx_cnts = 0, tx_sz = 0; // 发送计数、大小
+      let rx_cnts = 0, rx_sz = 0; // 接收计数、大小
+      let fp_cnts = 0, fp_sz = 0, img_cnts = 0;
+      let i = 0;
 
-    let reactProps = Object.keys(mainScreen).find(key => key.startsWith('__reactProps$'));
-    if (!reactProps) return null;
+      let reactProps = Object.keys(mainScreen).find(key => key.startsWith('__reactProps$'));
+      if (!reactProps) return null;
 
-    let msgProps = mainScreen[reactProps];
+      let msgProps = mainScreen[reactProps];
+      let Msgs = (msgProps.children[1].props.children[0]);
 
-    let Msgs = (msgProps.children[1].props.children[0]);
+      Msgs.forEach(function(msg_item) {
+          let msg = msg_item.props.message || msg_item.props.children[0].props.msg;
 
-    Msgs.forEach(function(msg_item){
-      let msg = msg_item.props.message || msg_item.props.children[0].props.msg;
+          if (msg.sender == "human" && msg.content[0].text) {
+              tx_cnts += 1;
+              tx_sz += msg.content[0].text.length;
+              for (i = 0; i < msg.attachments.length; i++) {
+                  tx_sz += msg.attachments[i].file_size;
+                  fp_cnts += 1;
+                  fp_sz += msg.attachments[i].file_size;
+              }
+              img_cnts += msg.files.length;
+          } else if (msg.sender == "assistant" && msg.content[0].text) {
+              rx_cnts += 1;
+              rx_sz += msg.content[0].text.length;
+          }
+      });
 
-      if(msg.sender == "human" && msg.content[0].text) {
-        tx_cnts +=1;
-        tx_sz += msg.content[0].text.length;
-        for(i = 0; i < msg.attachments.length; i++) {
-          tx_sz += msg.attachments[i].file_size;
-          fp_cnts += 1;
-          fp_sz += msg.attachments[i].file_size;;
-        }
-        img_cnts += msg.files.length;
-      } else if(msg.sender == "assistant" && msg.content[0].text) {
-        rx_cnts +=1;
-        rx_sz += msg.content[0].text.length;
-      }
-    });
-
-    return {
-      tx_cnts: tx_cnts, tx_sz: tx_sz,
-      rx_cnts: rx_cnts, rx_sz: rx_sz,
-      fp_cnts: fp_cnts, fp_sz: fp_sz,
-      img_cnts: img_cnts,
-    };
+      return {
+          tx_cnts, tx_sz,
+          rx_cnts, rx_sz,
+          fp_cnts, fp_sz,
+          img_cnts,
+      };
   }
 
-function msg_counter_main() {
+  function msg_counter_main() {
     let fieldset = document.querySelector("body > div.flex.min-h-screen.w-full fieldset") ||
-                  document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full> div.relative.mx-auto.flex.h-full.w-full > div.sticky.bottom-0.mx-auto.w-full");
+        document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full> div.relative.mx-auto.flex.h-full.w-full > div.sticky.bottom-0.mx-auto.w-full");
 
     if (fieldset) {
-      let ret = get_msg_count();
-      if(!ret) return;
+        let ret = get_msg_count();
+        if (!ret) return;
 
-      let count_result = document.querySelector("#claude-msg-counter")
-      if(!count_result) {
-        count_result = document.createElement("pre");
-        count_result.id = "claude-msg-counter";
-        count_result.className = "border-0.5 relative z-[5] text-text-200 border-accent-pro-100/20 bg-accent-pro-900 rounded-t-xl border-b-0";
-        count_result.style = "font-size:12px; padding: 5px 7px 14px; margin: -3px 0px -12px; text-wrap: pretty; z-index: 6;";
+        let count_result = document.querySelector("#claude-msg-counter");
+        if (!count_result) {
+            count_result = document.createElement("pre");
+            count_result.id = "claude-msg-counter";
+            count_result.className = "border-0.5 relative z-[5] text-text-200 border-accent-pro-100/20 bg-accent-pro-900 rounded-t-xl border-b-0";
+            count_result.style = "font-size:12px; padding: 5px 7px 14px; margin: -3px 0px -12px; text-wrap: pretty; z-index: 6;";
 
-        let targetParent = fieldset.querySelector("div.flex.md\\:px-2.flex-col-reverse");
-        if(targetParent) {
-          targetParent.insertBefore(count_result, targetParent.firstChild);
-        } else if(fieldset.querySelector("div.flex.w-full.flex-col.items-center")) {
-          fieldset.querySelector("div.flex.w-full.flex-col.items-center").before(count_result);
+            let targetParent = fieldset.querySelector("div.flex.md\\:px-2.flex-col-reverse");
+            if (targetParent) {
+                targetParent.insertBefore(count_result, targetParent.firstChild);
+            } else if (fieldset.querySelector("div.flex.w-full.flex-col.items-center")) {
+                fieldset.querySelector("div.flex.w-full.flex-col.items-center").before(count_result);
+            }
         }
-      }
 
-      let all_length = ret.tx_sz + ret.rx_sz;
-      let file_info = ret.fp_cnts ? `,${ret.fp_cnts}个附件(${ret.fp_sz}字)` : '';
-      let img_info = ret.img_cnts ? `,${ret.img_cnts}个媒体文件` : '';
-      const token = conversation_tokensSoFar();
-      let token_info = token ? `|【Token】:${token}` : '';
+        let all_length = ret.tx_sz + ret.rx_sz;
+        let file_info = ret.fp_cnts ? `,${ret.fp_cnts}个附件(${ret.fp_sz}字)` : '';
+        let img_info = ret.img_cnts ? `,${ret.img_cnts}个媒体文件` : '';
+        const totalToken = conversation_tokensSoFar();
+        let token_info = totalToken ? `|【Token】:${totalToken}` : '';
 
-      count_result.innerText = `【统计】已发:${ret.tx_cnts}条,${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条,${ret.rx_sz}字|合计:${all_length}字${token_info}`;
+        // 计算 cost (关键部分)
+        const model = conversation_model();
+        let cost_info = '';
+
+        if (model && totalToken) {
+            let inTokens, outTokens;
+            if (all_length > 0) {
+                // 按字数比例分配 token
+                inTokens = totalToken * (ret.tx_sz / all_length);
+                outTokens = totalToken * (ret.rx_sz / all_length);
+            } else {
+                // 如果总字数为 0，则 token 也都为 0
+                inTokens = 0;
+                outTokens = 0;
+            }
+
+            const conversationCost = calculateConversationCost(model, inTokens, outTokens);
+            cost_info = conversationCost ? `|【Cost】:USD ${conversationCost}` : '';
+        }
+
+        count_result.innerText = `【统计】已发:${ret.tx_cnts}条,${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条,${ret.rx_sz}字|合计:${all_length}字${token_info}${cost_info}`;
     }
-  }
-
+}
   setInterval(() => {
     msg_counter_main();
   }, 1600);
