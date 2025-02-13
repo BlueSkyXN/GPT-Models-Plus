@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Claude helper
 // @name:zh-CN  Claude 助手
-// @version      1.0.0
+// @version      1.0.1
 // @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。
 // @author       BlueSKyXN
 // @match        https://claude.ai/*
@@ -95,6 +95,22 @@
     const outCost = (outTokens / 1_000_000) * outRate;
     return (inCost + outCost).toFixed(4);
   }
+
+    // 新增函数：计算完整上下文下的总输入 Token 数和总输出 Token 数
+    function computeFullContextTokenUsage(inTokens, outTokens, roundCount) {
+        if (roundCount <= 0) return { totalInput: 0, totalOutput: 0 };
+        // 平均每轮用户输入 Token 数 (A) 与 AI 回复 Token 数 (B)
+        const A = inTokens / roundCount;
+        const B = outTokens / roundCount;
+        // 利用等差数列求和公式：
+        // 总输入 Token 数 = A*(1+2+...+roundCount) + B*(0+1+...+(roundCount-1))
+        //                 = A * (roundCount*(roundCount+1)/2) + B * (roundCount*(roundCount-1)/2)
+        const totalInput = (roundCount * (roundCount + 1) / 2) * A + (roundCount * (roundCount - 1) / 2) * B;
+        // 总输出 Token 数 = roundCount * B ，因为每轮的 AI 回复只生成一次，不会重复计入
+        const totalOutput = roundCount * B;
+        return { totalInput, totalOutput };
+    }
+
 
   // model info
   function conversation_model() {
@@ -215,17 +231,24 @@
       const totalToken = conversation_tokensSoFar();
       const model = conversation_model(); // 获取模型名称
 
+
       let inTokens = 0, outTokens = 0; // 初始化
       if (totalToken && all_length > 0) {
         inTokens = totalToken * (ret.tx_sz / all_length);
         outTokens = totalToken * (ret.rx_sz / all_length);
       }
       const conversationCost = (model && totalToken) ? calculateConversationCost(model, inTokens, outTokens) : null; // 确保模型和token存在
+      // 【新增】计算完整上下文模式下，每次 API 调用的累计 Token 消耗
+      // 这里轮次取用户发送次数（也可取 Math.min(ret.tx_cnts, ret.rx_cnts)）
+      const roundCount = ret.tx_cnts;
+      const fullUsage = computeFullContextTokenUsage(inTokens, outTokens, roundCount);
+      const totalFullCost = (model && fullUsage) ? calculateConversationCost(model, fullUsage.totalInput, fullUsage.totalOutput) : null;
+
 
       let cost_info = conversationCost ? `|【Cost】:USD ${conversationCost}` : '';
       let model_info = model ? ` (${model})` : ''; // 模型信息
 
-      count_result.innerText = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字\n【Token】:${totalToken}${cost_info}${model_info}`;
+      count_result.innerText = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字\n【Token】:${totalToken}${cost_info}${model_info}\n【Total-Token-Input】: ${Math.round(fullUsage.totalInput)}|【Total-Token-Output】: ${Math.round(fullUsage.totalOutput)}|【TotalCost】:USD ${totalFullCost}`;
     }
   }
   setInterval(() => {
