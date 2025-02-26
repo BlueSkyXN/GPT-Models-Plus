@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Claude helper (Enhanced)
-// @name:zh-CN  Claude 助手（增强版）
-// @version      1.1.0
+// @name        Claude helper
+// @name:zh-CN  Claude 助手
+// @version      1.1.1
 // @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。✴️4、支持思考模式下的字数统计
-// @author       BlueSKyXN (Enhanced by User)
+// @author       BlueSkyXN
 // @match        https://claude.ai/*
 // @include      https://*claude*.com/*
 // @icon         data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg4MHY4MEgweiIgZmlsbD0iIzQ0NSIvPjxwYXRoIGQ9Im0zMyA0NC0yMy0xYy0xIDAtMi0yLTItM3MwLTEgMS0xbDI0IDItMjEtMTVjMC0xLTEtMS0xLTNzMy00IDYtMmwxNCAxMi05LTE3di0yYzAtMSAxLTUgMy01IDEgMCAzIDAgNCAxbDExIDIzIDItMjBjMC0yIDEtNCAzLTRzMyAxIDMgMmwtMyAyMCAxMi0xNGMxLTEgMy0yIDQtMSAyIDIgMiA0IDEgNkw1MSAzN2gxbDEyLTJjMy0xIDYtMiA3IDAgMSAxIDAgMyAwIDNsLTIxIDVjMTQgMSAxNSAwIDE4IDEgMiAwIDMgMiAzIDMgMCAzLTIgMy0zIDNsLTE5LTQgMTUgMTR2MWwtMiAxYy0xIDAtOS03LTE0LTExbDcgMTFjMSAxIDEgMyAwIDRzLTMgMS0zIDBMNDEgNTBjMCA3LTEgMTMtMiAxOSAwIDEtMSAxLTMgMi0xIDAtMy0xLTItM2wxLTQgMy0xNi0xMCAxMy00IDVoLTFjLTEgMC0yLTEtMi0zbDE0LTE4LTE3IDExaC00cy0xLTIgMC0zbDUtNHoiIGZpbGw9IiNENzUiLz48L3N2Zz4=
@@ -64,7 +64,7 @@
     .hidden.md\:flex { display: flex; }
     .hidden.flex-row-reverse { display: flex; }
   `);
-  
+
   // 增加思考模式相关的样式调整
   GM_addStyle(`
     .thinking-highlight {
@@ -73,7 +73,7 @@
       padding-left: 8px;
       margin: 4px 0;
     }
-    
+
     #claude-msg-counter {
       font-size: 12px;
       padding: 5px 7px 8px;
@@ -82,7 +82,7 @@
       z-index: 6;
       line-height: 1.4;
     }
-    
+
     .thinking-indicator {
       color: #2979ff;
       font-weight: bold;
@@ -124,12 +124,19 @@
     // 平均每轮用户输入 Token 数 (A) 与 AI 回复 Token 数 (B)
     const A = inTokens / roundCount;
     const B = outTokens / roundCount;
-    // 利用等差数列求和公式：
+
+    // 如果使用API，每次请求都需发送所有历史消息
+    // 利用等差数列求和公式计算API总输入Token：
+    // 第1轮: A
+    // 第2轮: 2A + B (A+A+B)
+    // 第3轮: 3A + 2B (A+A+A+B+B)
     // 总输入 Token 数 = A*(1+2+...+roundCount) + B*(0+1+...+(roundCount-1))
     //                 = A * (roundCount*(roundCount+1)/2) + B * (roundCount*(roundCount-1)/2)
     const totalInput = (roundCount * (roundCount + 1) / 2) * A + (roundCount * (roundCount - 1) / 2) * B;
-    // 总输出 Token 数 = roundCount * B ，因为每轮的 AI 回复只生成一次，不会重复计入
+
+    // 总输出 Token 数 = roundCount * B，即所有AI回复的Token总和
     const totalOutput = roundCount * B;
+
     return { totalInput, totalOutput };
   }
 
@@ -181,7 +188,7 @@
   // 检测思考模式是否启用
   function isThinkingModeEnabled() {
     // 检查DOM中是否存在思考模式的标识
-    return !!document.querySelector('[data-thinking="true"]') || 
+    return !!document.querySelector('[data-thinking="true"]') ||
            !!document.querySelector('.thinking-container') ||
            !!document.querySelector('[data-is-thinking]');
   }
@@ -200,20 +207,20 @@
   function getThinkingContentFromDOM() {
     let thinkingContent = "";
     const thinkingElements = document.querySelectorAll('[data-thinking="true"]');
-    
+
     thinkingElements.forEach(el => {
       thinkingContent += el.textContent || "";
     });
-    
+
     return thinkingContent;
   }
 
   // var last_uuid = '', last_length = 0;
-  
+
   // 改进后的消息计数函数，支持思考模式
   function get_msg_count() {
     console.log("尝试获取消息计数...");
-    
+
     let mainScreen = document.querySelector("body > div.flex.min-h-screen.w-full > div > div > div.relative.flex.w-full > div.relative.mx-auto.flex");
     if (!mainScreen) {
       console.log("找不到主屏幕元素，尝试备用选择器");
@@ -233,14 +240,14 @@
     }
 
     let msgProps = mainScreen[reactProps];
-    
+
     // 尝试多种可能的路径获取消息列表
     let Msgs;
     try {
       Msgs = msgProps.children[1].props.children[0];
       if (!Msgs || !Array.isArray(Msgs)) {
         console.log("尝试其他消息路径");
-        Msgs = msgProps.children[0]?.props?.children || 
+        Msgs = msgProps.children[0]?.props?.children ||
               msgProps.children[1]?.props?.messages || [];
       }
     } catch (e) {
@@ -249,35 +256,35 @@
     }
 
     console.log(`找到 ${Msgs.length} 条消息`);
-    
+
     // 遍历处理每条消息
     Msgs.forEach(function(msg_item, index) {
       try {
         // 尝试多种可能的消息路径
         let msg;
         if (msg_item.props) {
-          msg = msg_item.props.message || 
-                (msg_item.props.children && 
-                 msg_item.props.children[0] && 
-                 msg_item.props.children[0].props && 
-                 (msg_item.props.children[0].props.msg || 
+          msg = msg_item.props.message ||
+                (msg_item.props.children &&
+                 msg_item.props.children[0] &&
+                 msg_item.props.children[0].props &&
+                 (msg_item.props.children[0].props.msg ||
                   msg_item.props.children[0].props.message));
         }
-        
+
         if (!msg) {
           console.log(`跳过消息 ${index}，无法提取数据`);
           return;
         }
-        
+
         // 调试输出第一条消息结构
         if (index === 0) {
           console.log("消息结构样例:", msg);
         }
-        
+
         // 处理用户消息
         if (msg.sender === "human" || msg.role === "user") {
           tx_cnts += 1;
-          
+
           // 处理文本内容 - 考虑多种可能的结构
           if (msg.content && Array.isArray(msg.content)) {
             msg.content.forEach(item => {
@@ -292,7 +299,7 @@
           } else if (msg.content && typeof msg.content === 'string') {
             tx_sz += msg.content.length;
           }
-          
+
           // 处理附件
           if (msg.attachments && Array.isArray(msg.attachments)) {
             for (let i = 0; i < msg.attachments.length; i++) {
@@ -303,16 +310,16 @@
               }
             }
           }
-          
+
           // 处理文件
           if (msg.files && Array.isArray(msg.files)) {
             img_cnts += msg.files.length;
           }
-        } 
+        }
         // 处理AI回复
         else if (msg.sender === "assistant" || msg.role === "assistant") {
           rx_cnts += 1;
-          
+
           // 处理回复文本内容
           if (msg.content && Array.isArray(msg.content)) {
             msg.content.forEach(item => {
@@ -327,12 +334,12 @@
           } else if (msg.content && typeof msg.content === 'string') {
             rx_sz += msg.content.length;
           }
-          
+
           // 处理思考内容
           if (msg.thinking_text) {
             thinking_sz += msg.thinking_text.length;
           }
-          
+
           // 处理其他可能的思考内容格式
           if (msg.thinking) {
             if (typeof msg.thinking === 'string') {
@@ -346,15 +353,15 @@
         console.error(`处理消息 ${index} 时出错:`, e);
       }
     });
-    
+
     console.log(`统计结果: 发送=${tx_cnts}条/${tx_sz}字, 回复=${rx_cnts}条/${rx_sz}字, 思考=${thinking_sz}字`);
-    
+
     // 如果发现回复数量大于0但回复大小为0，可能是思考模式导致的解析问题
     // 尝试从DOM中直接获取思考内容
     if (rx_cnts > 0 && rx_sz === 0 && isThinkingModeEnabled()) {
       console.log("检测到思考模式但无法解析回复内容，尝试从DOM获取");
       thinking_sz = getThinkingContentFromDOM().length;
-      
+
       // 如果能从DOM中获取到思考内容，将其计入回复大小
       if (thinking_sz > 0) {
         rx_sz = thinking_sz;
@@ -364,9 +371,9 @@
         return get_msg_count_from_dom();
       }
     }
-    
+
     const thinkingType = getThinkingModeType();
-    
+
     return {
       tx_cnts, tx_sz,
       rx_cnts, rx_sz,
@@ -381,31 +388,31 @@
   // 备用方法：从DOM直接解析消息内容
   function get_msg_count_from_dom() {
     console.log("使用DOM解析方法获取消息...");
-    
+
     // 查找消息容器
     const msgContainer = document.querySelector("div.relative.flex.w-full > div.relative.mx-auto.flex");
     if (!msgContainer) {
       console.log("找不到消息容器");
       return null;
     }
-    
+
     let tx_cnts = 0, tx_sz = 0;
     let rx_cnts = 0, rx_sz = 0;
     let fp_cnts = 0, fp_sz = 0, img_cnts = 0;
     let thinking_sz = 0;
-    
+
     // 查找所有消息元素
     const msgElements = msgContainer.querySelectorAll('div[data-test-render-count]');
     console.log(`从DOM找到 ${msgElements.length} 条消息元素`);
-    
+
     msgElements.forEach((msgEl, index) => {
       // 判断消息类型
-      const isHuman = msgEl.querySelector('[data-message-author="human"]') || 
+      const isHuman = msgEl.querySelector('[data-message-author="human"]') ||
                       msgEl.querySelector('.relative.group.inline-flex');
-      const isAssistant = msgEl.querySelector('[data-message-author="assistant"]') || 
+      const isAssistant = msgEl.querySelector('[data-message-author="assistant"]') ||
                          msgEl.querySelector('[data-is-streaming]');
       const isThinking = msgEl.querySelector('[data-thinking="true"]');
-      
+
       if (isHuman) {
         tx_cnts++;
         // 获取文本内容
@@ -413,7 +420,7 @@
         textEls.forEach(el => {
           tx_sz += el.textContent.length;
         });
-        
+
         // 计算附件
         const attachments = msgEl.querySelectorAll('.attachment, [data-attachment]');
         fp_cnts += attachments.length;
@@ -427,13 +434,13 @@
             }
           }
         });
-        
+
         // 计算图片
         img_cnts += msgEl.querySelectorAll('img').length;
-      } 
+      }
       else if (isAssistant || isThinking) {
         if (isAssistant) rx_cnts++;
-        
+
         // 获取回复文本内容
         const textEls = msgEl.querySelectorAll('.prose, .text-base');
         textEls.forEach(el => {
@@ -441,7 +448,7 @@
             rx_sz += el.textContent.length;
           }
         });
-        
+
         // 获取思考内容
         if (isThinking) {
           const thinkingEls = msgEl.querySelectorAll('[data-thinking="true"]');
@@ -452,11 +459,11 @@
         }
       }
     });
-    
+
     console.log(`DOM解析结果: 发送=${tx_cnts}条/${tx_sz}字, 回复=${rx_cnts}条/${rx_sz}字, 思考=${thinking_sz}字`);
-    
+
     const thinkingType = getThinkingModeType();
-    
+
     return {
       tx_cnts, tx_sz,
       rx_cnts, rx_sz,
@@ -496,7 +503,7 @@
       let all_length = ret.tx_sz + ret.rx_sz;
       let file_info = ret.fp_cnts ? `, ${ret.fp_cnts}个附件(${ret.fp_sz}字)` : '';
       let img_info = ret.img_cnts ? `, ${ret.img_cnts}个媒体文件` : '';
-      
+
       const totalToken = conversation_tokensSoFar();
       const model = conversation_model();
 
@@ -505,7 +512,7 @@
       if (totalToken && all_length > 0) {
         // 确保不会除以零
         const divisor = Math.max(all_length, 1);
-        
+
         // 如果启用了思考模式且输出统计为0但有回复
         if (ret.thinkingEnabled && ret.rx_cnts > 0 && ret.rx_sz < 10) {
           // 使用默认分配比例：通常AI输出占主要部分
@@ -518,14 +525,14 @@
           outTokens = totalToken * (ret.rx_sz / divisor);
         }
       }
-      
-      const conversationCost = (model && totalToken) ? 
+
+      const conversationCost = (model && totalToken) ?
         calculateConversationCost(model, inTokens, outTokens) : null;
-      
+
       // 计算完整上下文Token使用量
       const roundCount = ret.tx_cnts;
       const fullUsage = computeFullContextTokenUsage(inTokens, outTokens, roundCount);
-      const totalFullCost = (model && fullUsage) ? 
+      const totalFullCost = (model && fullUsage) ?
         calculateConversationCost(model, fullUsage.totalInput, fullUsage.totalOutput) : null;
 
       // 思考模式信息显示
@@ -533,7 +540,7 @@
       if (ret.thinkingEnabled) {
         const thinkingTypeText = ret.thinkingType === "extended" ? "扩展思考" : "标准思考";
         thinkingInfo = ` <span class="thinking-indicator">[${thinkingTypeText}模式]</span>`;
-        
+
         if (ret.thinking_sz > 0) {
           thinkingInfo += ` (思考过程:${ret.thinking_sz}字)`;
         }
@@ -545,7 +552,7 @@
       count_result.innerHTML = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字${thinkingInfo}\n【Token】:${totalToken}${cost_info}${model_info}\n【Total-Token-Input】: ${Math.round(inTokens)}|【Total-Token-Output】: ${Math.round(outTokens)}|【TotalCost】:USD ${totalFullCost}`;
     }
   }
-  
+
   // 定期更新消息计数
   setInterval(() => {
     msg_counter_main();
@@ -560,19 +567,19 @@
 
     msg_divs.forEach(function(msg_div){
       if (msg_div.nextSibling && msg_div.nextSibling.className === 'msg-uptime') return;
-      
+
       let reactProps = Object.keys(msg_div).find(key => key.startsWith('__reactProps$'));
       if (!reactProps) return;
-      
+
       let divProps = msg_div[reactProps];
-      let updated_at = divProps.children?.[1]?.props?.message?.updated_at ?? 
+      let updated_at = divProps.children?.[1]?.props?.message?.updated_at ??
                       divProps.children?.[1]?.props?.children?.[2]?.props?.message?.updated_at;
-      
+
       if (!updated_at) return;
-      
+
       const date = new Date(updated_at);
       if (!date) return;
-      
+
       const localDateStr = date.toLocaleString();
       let timeNode = document.createElement("div");
       timeNode.innerText = localDateStr;
@@ -580,7 +587,7 @@
       msg_div.after(timeNode);
     });
   }
-  
+
   // 时间显示样式
   GM_addStyle(`
   div[data-test-render-count] > div > .msg-uptime {
@@ -590,7 +597,7 @@
      margin: -2px 5px 5px; font-size: 13px; font-weight: 300;
   }
   `);
-  
+
   // 定期更新消息时间显示
   setInterval(() => {
     show_msg_time();
@@ -684,7 +691,7 @@
     if (token) {
       token_info = `- tokensSoFar      : ${token}\n`;
     }
-    
+
     let thinking_info = '';
     if (thinkingEnabled) {
       thinking_info = `- thinking mode     : ${thinkingType || "enabled"}\n`;
@@ -721,7 +728,7 @@
       let msg = msg_item.props?.message || msg_item.props?.children[0]?.props.msg;
 
       context += `\n## ${msg.sender}:\n\n`;
-      
+
       // 处理思考内容（如果有）
       if (msg.thinking_text) {
         context += `### Thinking Process:\n\n${msg.thinking_text}\n\n### Response:\n\n`;
@@ -732,10 +739,10 @@
           context += `### Thinking Process:\n\n${msg.thinking.text}\n\n### Response:\n\n`;
         }
       }
-      
+
       // 处理内容
       context += msg.text || '';
-      
+
       for(i = 0; i < msg.content.length; i++) {
         context += msg.content[i].text || '';
         if (msg.content[i].input?.id) {
@@ -751,7 +758,7 @@
           context += `\n\`\`\`file_context\n ${msg.attachments[i].extracted_content}\n\`\`\`\n`;
         }
       }
-      
+
       // 处理文件
       for(i = 0; i < msg.files.length; i++) {
         context += `file: ${msg.files[i].file_name}\n`
@@ -960,7 +967,7 @@
             if (detailedConversation.chat_messages?.length == 0) {
               continue;
             }
-            
+
             // 保存为JSON
             const fileContent = JSON.stringify(detailedConversation, null, 2);
 
