@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Claude helper
 // @name:zh-CN  Claude 助手
-// @version      1.1.1
+// @version      1.1.2
 // @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。✴️4、支持思考模式下的字数统计
 // @author       BlueSkyXN
 // @match        https://claude.ai/*
@@ -214,8 +214,6 @@
 
     return thinkingContent;
   }
-
-  // var last_uuid = '', last_length = 0;
 
   // 改进后的消息计数函数，支持思考模式
   function get_msg_count() {
@@ -549,7 +547,8 @@
       let cost_info = conversationCost ? `|【Cost】:USD ${conversationCost}` : '';
       let model_info = model ? ` (${model})` : '';
 
-      count_result.innerHTML = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字${thinkingInfo}\n【Token】:${totalToken}${cost_info}${model_info}\n【Total-Token-Input】: ${Math.round(inTokens)}|【Total-Token-Output】: ${Math.round(outTokens)}|【TotalCost】:USD ${totalFullCost}`;
+      // 修复：使用 fullUsage.totalInput 和 fullUsage.totalOutput 而不是 inTokens 和 outTokens
+      count_result.innerHTML = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字${thinkingInfo}\n【Token】:${totalToken}${cost_info}${model_info}\n【Total-Token-Input】: ${Math.round(fullUsage.totalInput)}|【Total-Token-Output】: ${Math.round(fullUsage.totalOutput)}|【TotalCost】:USD ${totalFullCost}`;
     }
   }
 
