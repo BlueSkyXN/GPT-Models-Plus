@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        Claude helper
 // @name:zh-CN  Claude 助手
-// @version      1.1.2
-// @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。✴️4、支持思考模式下的字数统计
+// @version      1.1.3
+// @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。
 // @author       BlueSkyXN
 // @match        https://claude.ai/*
 // @include      https://*claude*.com/*
@@ -65,15 +65,8 @@
     .hidden.flex-row-reverse { display: flex; }
   `);
 
-  // 增加思考模式相关的样式调整
+  // 样式调整，移除了思考模式相关的样式
   GM_addStyle(`
-    .thinking-highlight {
-      background-color: rgba(41, 121, 255, 0.1);
-      border-left: 3px solid #2979ff;
-      padding-left: 8px;
-      margin: 4px 0;
-    }
-
     #claude-msg-counter {
       font-size: 12px;
       padding: 5px 7px 8px;
@@ -81,11 +74,6 @@
       text-wrap: pretty;
       z-index: 6;
       line-height: 1.4;
-    }
-
-    .thinking-indicator {
-      color: #2979ff;
-      font-weight: bold;
     }
   `);
 
@@ -185,37 +173,7 @@
     return tokensSoFar;
   }
 
-  // 检测思考模式是否启用
-  function isThinkingModeEnabled() {
-    // 检查DOM中是否存在思考模式的标识
-    return !!document.querySelector('[data-thinking="true"]') ||
-           !!document.querySelector('.thinking-container') ||
-           !!document.querySelector('[data-is-thinking]');
-  }
-
-  // 获取思考模式类型
-  function getThinkingModeType() {
-    // 检查是普通思考还是扩展思考
-    const extendedThinking = document.querySelector('[data-thinking-extended="true"]') ||
-                           document.querySelector('.extended-thinking');
-    if (extendedThinking) return "extended";
-    if (isThinkingModeEnabled()) return "standard";
-    return null;
-  }
-
-  // 从DOM获取思考内容
-  function getThinkingContentFromDOM() {
-    let thinkingContent = "";
-    const thinkingElements = document.querySelectorAll('[data-thinking="true"]');
-
-    thinkingElements.forEach(el => {
-      thinkingContent += el.textContent || "";
-    });
-
-    return thinkingContent;
-  }
-
-  // 改进后的消息计数函数，支持思考模式
+  // 改进后的消息计数函数，移除了思考模式的处理
   function get_msg_count() {
     console.log("尝试获取消息计数...");
 
@@ -229,7 +187,6 @@
     let tx_cnts = 0, tx_sz = 0; // 发送计数、大小
     let rx_cnts = 0, rx_sz = 0; // 接收计数、大小
     let fp_cnts = 0, fp_sz = 0, img_cnts = 0;
-    let thinking_sz = 0; // 思考内容大小
 
     let reactProps = Object.keys(mainScreen).find(key => key.startsWith('__reactProps$'));
     if (!reactProps) {
@@ -332,54 +289,19 @@
           } else if (msg.content && typeof msg.content === 'string') {
             rx_sz += msg.content.length;
           }
-
-          // 处理思考内容
-          if (msg.thinking_text) {
-            thinking_sz += msg.thinking_text.length;
-          }
-
-          // 处理其他可能的思考内容格式
-          if (msg.thinking) {
-            if (typeof msg.thinking === 'string') {
-              thinking_sz += msg.thinking.length;
-            } else if (msg.thinking && msg.thinking.text) {
-              thinking_sz += msg.thinking.text.length;
-            }
-          }
         }
       } catch (e) {
         console.error(`处理消息 ${index} 时出错:`, e);
       }
     });
 
-    console.log(`统计结果: 发送=${tx_cnts}条/${tx_sz}字, 回复=${rx_cnts}条/${rx_sz}字, 思考=${thinking_sz}字`);
-
-    // 如果发现回复数量大于0但回复大小为0，可能是思考模式导致的解析问题
-    // 尝试从DOM中直接获取思考内容
-    if (rx_cnts > 0 && rx_sz === 0 && isThinkingModeEnabled()) {
-      console.log("检测到思考模式但无法解析回复内容，尝试从DOM获取");
-      thinking_sz = getThinkingContentFromDOM().length;
-
-      // 如果能从DOM中获取到思考内容，将其计入回复大小
-      if (thinking_sz > 0) {
-        rx_sz = thinking_sz;
-        console.log(`从DOM获取到思考内容: ${thinking_sz}字`);
-      } else {
-        // 如果仍然无法获取，则尝试DOM方法
-        return get_msg_count_from_dom();
-      }
-    }
-
-    const thinkingType = getThinkingModeType();
+    console.log(`统计结果: 发送=${tx_cnts}条/${tx_sz}字, 回复=${rx_cnts}条/${rx_sz}字`);
 
     return {
       tx_cnts, tx_sz,
       rx_cnts, rx_sz,
       fp_cnts, fp_sz,
-      img_cnts,
-      thinking_sz,
-      thinkingEnabled: isThinkingModeEnabled(),
-      thinkingType: thinkingType
+      img_cnts
     };
   }
 
@@ -397,7 +319,6 @@
     let tx_cnts = 0, tx_sz = 0;
     let rx_cnts = 0, rx_sz = 0;
     let fp_cnts = 0, fp_sz = 0, img_cnts = 0;
-    let thinking_sz = 0;
 
     // 查找所有消息元素
     const msgElements = msgContainer.querySelectorAll('div[data-test-render-count]');
@@ -409,7 +330,6 @@
                       msgEl.querySelector('.relative.group.inline-flex');
       const isAssistant = msgEl.querySelector('[data-message-author="assistant"]') ||
                          msgEl.querySelector('[data-is-streaming]');
-      const isThinking = msgEl.querySelector('[data-thinking="true"]');
 
       if (isHuman) {
         tx_cnts++;
@@ -436,40 +356,24 @@
         // 计算图片
         img_cnts += msgEl.querySelectorAll('img').length;
       }
-      else if (isAssistant || isThinking) {
-        if (isAssistant) rx_cnts++;
+      else if (isAssistant) {
+        rx_cnts++;
 
         // 获取回复文本内容
         const textEls = msgEl.querySelectorAll('.prose, .text-base');
         textEls.forEach(el => {
-          if (!isThinking || !el.closest('[data-thinking="true"]')) {
-            rx_sz += el.textContent.length;
-          }
+          rx_sz += el.textContent.length;
         });
-
-        // 获取思考内容
-        if (isThinking) {
-          const thinkingEls = msgEl.querySelectorAll('[data-thinking="true"]');
-          thinkingEls.forEach(el => {
-            const thinkingText = el.textContent || "";
-            thinking_sz += thinkingText.length;
-          });
-        }
       }
     });
 
-    console.log(`DOM解析结果: 发送=${tx_cnts}条/${tx_sz}字, 回复=${rx_cnts}条/${rx_sz}字, 思考=${thinking_sz}字`);
-
-    const thinkingType = getThinkingModeType();
+    console.log(`DOM解析结果: 发送=${tx_cnts}条/${tx_sz}字, 回复=${rx_cnts}条/${rx_sz}字`);
 
     return {
       tx_cnts, tx_sz,
       rx_cnts, rx_sz,
       fp_cnts, fp_sz,
-      img_cnts,
-      thinking_sz,
-      thinkingEnabled: isThinkingModeEnabled(),
-      thinkingType: thinkingType
+      img_cnts
     };
   }
 
@@ -505,23 +409,15 @@
       const totalToken = conversation_tokensSoFar();
       const model = conversation_model();
 
-      // 处理Token分配，考虑思考模式的特殊情况
+      // 处理Token分配，移除了思考模式的特殊处理
       let inTokens = 0, outTokens = 0;
       if (totalToken && all_length > 0) {
         // 确保不会除以零
         const divisor = Math.max(all_length, 1);
-
-        // 如果启用了思考模式且输出统计为0但有回复
-        if (ret.thinkingEnabled && ret.rx_cnts > 0 && ret.rx_sz < 10) {
-          // 使用默认分配比例：通常AI输出占主要部分
-          outTokens = totalToken * 0.75;
-          inTokens = totalToken * 0.25;
-          console.log("思考模式下使用默认Token分配比例");
-        } else {
-          // 正常按比例分配
-          inTokens = totalToken * (ret.tx_sz / divisor);
-          outTokens = totalToken * (ret.rx_sz / divisor);
-        }
+        
+        // 正常按比例分配
+        inTokens = totalToken * (ret.tx_sz / divisor);
+        outTokens = totalToken * (ret.rx_sz / divisor);
       }
 
       const conversationCost = (model && totalToken) ?
@@ -533,22 +429,10 @@
       const totalFullCost = (model && fullUsage) ?
         calculateConversationCost(model, fullUsage.totalInput, fullUsage.totalOutput) : null;
 
-      // 思考模式信息显示
-      let thinkingInfo = '';
-      if (ret.thinkingEnabled) {
-        const thinkingTypeText = ret.thinkingType === "extended" ? "扩展思考" : "标准思考";
-        thinkingInfo = ` <span class="thinking-indicator">[${thinkingTypeText}模式]</span>`;
-
-        if (ret.thinking_sz > 0) {
-          thinkingInfo += ` (思考过程:${ret.thinking_sz}字)`;
-        }
-      }
-
       let cost_info = conversationCost ? `|【Cost】:USD ${conversationCost}` : '';
       let model_info = model ? ` (${model})` : '';
 
-      // 修复：使用 fullUsage.totalInput 和 fullUsage.totalOutput 而不是 inTokens 和 outTokens
-      count_result.innerHTML = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字${thinkingInfo}\n【Token】:${totalToken}${cost_info}${model_info}\n【Total-Token-Input】: ${Math.round(fullUsage.totalInput)}|【Total-Token-Output】: ${Math.round(fullUsage.totalOutput)}|【TotalCost】:USD ${totalFullCost}`;
+      count_result.innerHTML = `【统计】已发:${ret.tx_cnts}条, ${ret.tx_sz}字${file_info}${img_info}|已回:${ret.rx_cnts}条, ${ret.rx_sz}字|合计:${all_length}字\n【Token】:${totalToken}${cost_info}${model_info}\n【Total-Token-Input】: ${Math.round(fullUsage.totalInput)}|【Total-Token-Output】: ${Math.round(fullUsage.totalOutput)}|【TotalCost】:USD ${totalFullCost}`;
     }
   }
 
@@ -678,8 +562,6 @@
 
     const model = conversation_model();
     const token = conversation_tokensSoFar();
-    const thinkingEnabled = isThinkingModeEnabled();
-    const thinkingType = getThinkingModeType();
 
     let model_info = '';
     if (model) {
@@ -689,11 +571,6 @@
     let token_info = '';
     if (token) {
       token_info = `- tokensSoFar      : ${token}\n`;
-    }
-
-    let thinking_info = '';
-    if (thinkingEnabled) {
-      thinking_info = `- thinking mode     : ${thinkingType || "enabled"}\n`;
     }
 
     let time_info='';
@@ -720,24 +597,13 @@
       account_info = `- account          : ${account_email}\n`;
     }
 
-    context += `# ${name}\n\n${account_info}${model_info}${token_info}${thinking_info}${time_info}- conversationUUID : ${convID}\n`;
+    context += `# ${name}\n\n${account_info}${model_info}${token_info}${time_info}- conversationUUID : ${convID}\n`;
 
     // 处理每条消息
     Msgs.forEach(function(msg_item){
       let msg = msg_item.props?.message || msg_item.props?.children[0]?.props.msg;
 
       context += `\n## ${msg.sender}:\n\n`;
-
-      // 处理思考内容（如果有）
-      if (msg.thinking_text) {
-        context += `### Thinking Process:\n\n${msg.thinking_text}\n\n### Response:\n\n`;
-      } else if (msg.thinking) {
-        if (typeof msg.thinking === 'string') {
-          context += `### Thinking Process:\n\n${msg.thinking}\n\n### Response:\n\n`;
-        } else if (msg.thinking?.text) {
-          context += `### Thinking Process:\n\n${msg.thinking.text}\n\n### Response:\n\n`;
-        }
-      }
 
       // 处理内容
       context += msg.text || '';
