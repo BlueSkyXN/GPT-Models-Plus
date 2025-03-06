@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Claude helper
-// @name:zh-CN  Claude 助手
-// @version      1.1.3
+// @name        Claude helper (Optimized)
+// @name:zh-CN  Claude 助手 (优化版)
+// @version      1.2.0
 // @description  ✴️1、可以导出 claude ai对话的内容。✴️2、统计当前字数 (包括粘贴、上传、article的内容，含换行符/markdown语法符号等)。✴️3、显示对话的时间、模型信息、Token用量。ℹ️显示的信息均来自网页内本身存在但未显示的属性值。
-// @author       BlueSkyXN
+// @author       BlueSkyXN (Optimized)
 // @match        https://claude.ai/*
 // @include      https://*claude*.com/*
 // @icon         data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg4MHY4MEgweiIgZmlsbD0iIzQ0NSIvPjxwYXRoIGQ9Im0zMyA0NC0yMy0xYy0xIDAtMi0yLTItM3MwLTEgMS0xbDI0IDItMjEtMTVjMC0xLTEtMS0xLTNzMy00IDYtMmwxNCAxMi05LTE3di0yYzAtMSAxLTUgMy01IDEgMCAzIDAgNCAxbDExIDIzIDItMjBjMC0yIDEtNCAzLTRzMyAxIDMgMmwtMyAyMCAxMi0xNGMxLTEgMy0yIDQtMSAyIDIgMiA0IDEgNkw1MSAzN2gxbDEyLTJjMy0xIDYtMiA3IDAgMSAxIDAgMyAwIDNsLTIxIDVjMTQgMSAxNSAwIDE4IDEgMiAwIDMgMiAzIDMgMCAzLTIgMy0zIDNsLTE5LTQgMTUgMTR2MWwtMiAxYy0xIDAtOS03LTE0LTExbDcgMTFjMSAxIDEgMyAwIDRzLTMgMS0zIDBMNDEgNTBjMCA3LTEgMTMtMiAxOSAwIDEtMSAxLTMgMi0xIDAtMy0xLTItM2wxLTQgMy0xNi0xMCAxMy00IDVoLTFjLTEgMC0yLTEtMi0zbDE0LTE4LTE3IDExaC00cy0xLTIgMC0zbDUtNHoiIGZpbGw9IiNENzUiLz48L3N2Zz4=
@@ -436,11 +436,6 @@
     }
   }
 
-  // 定期更新消息计数
-  setInterval(() => {
-    msg_counter_main();
-  }, 1600);
-
   // 显示消息发送时间
   function show_msg_time() {
     let mainScreen = document.querySelector("body > div.flex.min-h-screen.w-full > div > div.flex.h-screen");
@@ -480,11 +475,6 @@
      margin: -2px 5px 5px; font-size: 13px; font-weight: 300;
   }
   `);
-
-  // 定期更新消息时间显示
-  setInterval(() => {
-    show_msg_time();
-  }, 2100);
 
   // 导出对话内容功能
   // 创建持久化元素的辅助函数
@@ -668,11 +658,8 @@
   // 添加下载按钮
   createPersistentElement("body > div.flex.min-h-screen.w-full div.sticky.items-center div.right-3 div.hidden.flex-row-reverse", createDownloadButton);
 
-})();
 
-
-// 备份所有对话功能
-(function() {
+  // 备份所有对话功能
   function AddDownloadAllChats(){
     let user_menu = document.querySelector('button[data-testid="user-menu-button"][id^=radix-] > div.relative.flex.w-full.items-center');
     if(!user_menu) {
@@ -889,7 +876,6 @@
 
   // 将页面上的重置时间用更完整的本地时间表示
   let lastProcessedTime = '';
-  const updateInterval = 2000; // 每2秒更新一次
 
   // 转换时间格式
   function convertTime(shortTime) {
@@ -934,27 +920,55 @@
     }
   }
 
-  // 防抖函数
-  function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
+  // ========================
+  // 更新频率优化部分 - 开始
+  // ========================
+
+  // 统一更新函数 - 一次调用所有需要更新的功能
+  function updateAll() {
+    msg_counter_main();
+    show_msg_time();
+    updateTime();
   }
 
-  const debouncedUpdateTime = debounce(updateTime, 350);
+  // 性能优化：使用较长的计时器间隔
+  setInterval(updateAll, 5000); // 每5秒更新一次所有内容，替代原来的多个短间隔计时器
 
-  // 监测变化
-  function checkForChanges() {
-    debouncedUpdateTime();
-    requestAnimationFrame(checkForChanges);
-  }
+  // 添加事件驱动的更新机制 - 使用MutationObserver
+  const messageObserver = new MutationObserver((mutations) => {
+    // 检查是否有相关变化
+    const needsUpdate = mutations.some(mutation => {
+      return mutation.type === 'childList' && 
+             (mutation.target.closest('div[data-test-render-count]') || 
+              mutation.addedNodes.length > 0 &&
+              Array.from(mutation.addedNodes).some(node => 
+                node.nodeType === 1 && 
+                (node.matches('div[data-test-render-count]') || 
+                 node.querySelector('div[data-test-render-count]'))
+              ));
+    });
+    
+    if (needsUpdate) {
+      updateAll();
+    }
+  });
 
-  requestAnimationFrame(checkForChanges);
-  setInterval(updateTime, updateInterval);
+  // 等待DOM加载完成后开始监视
+  setTimeout(() => {
+    const chatContainer = document.querySelector("div.relative.flex.w-full > div.relative.mx-auto.flex");
+    if (chatContainer) {
+      messageObserver.observe(chatContainer, {
+        childList: true,
+        subtree: true
+      });
+      console.log("[Claude Helper] 已启用基于DOM变化的自动更新");
+    } else {
+      console.log("[Claude Helper] 未找到聊天容器，仅使用定时器更新");
+    }
+  }, 2000);
+
+  // ========================
+  // 更新频率优化部分 - 结束
+  // ========================
+
 })();
