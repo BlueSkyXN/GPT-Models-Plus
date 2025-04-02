@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Grok Helper
 // @namespace    https://github.com/BlueSkyXN/GPT-Models-Plus
-// @version      0.1.0
+// @version      0.1.1
 // @author       BlueSkyXN
-// @description  Monitor Grok API rate limits (DEFAULT, REASONING, DEEPSEARCH), show summary + detail on hover
+// @description  Monitor Grok API rate limits (DEFAULT, REASONING, DEEPSEARCH, DEEPERSEARCH), show summary + detail on hover
 // @match        https://grok.com/*
 // @grant        GM_addStyle
 // @supportURL   https://github.com/BlueSkyXN/GPT-Models-Plus
@@ -15,14 +15,15 @@
 (function() {
     'use strict';
 
-    // 三种模式 -> 中文名称对应表
+    // 四种模式 -> 中文名称对应表
     const MODE_LABELS = {
         DEFAULT: '标准',
         REASONING: '思考',
-        DEEPSEARCH: '深度'
+        DEEPSEARCH: '深度',
+        DEEPERSEARCH: '更深'
     };
 
-    // 我们需要查询的三种模式
+    // 我们需要查询的四种模式
     const REQUEST_KINDS = Object.keys(MODE_LABELS);
 
     // 添加自定义样式
@@ -187,10 +188,17 @@
         return monitor;
     }
 
+    // 获取当前域名的基础URL
+    function getBaseUrl() {
+        return window.location.origin;
+    }
+
     // 获取每种模式的限额
     async function fetchRateLimit(kind) {
         try {
-            const response = await fetch('https://grok.com/rest/rate-limits', {
+            // 使用动态的基础URL
+            const baseUrl = getBaseUrl();
+            const response = await fetch(`${baseUrl}/rest/rate-limits`, {
                 method: 'POST',
                 headers: {
                     'accept': '*/*',
