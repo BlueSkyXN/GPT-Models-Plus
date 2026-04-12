@@ -3,7 +3,7 @@
 // @namespace    https://github.com/BlueSkyXN/GPT-Models-Plus
 // @version      1.0.0
 // @author       BlueSkyXN
-// @description  Monitor Grok rate limits for all models (Fast/Expert/Heavy/Auto/4Fast/4.1 + Grok-3 modes)
+// @description  Monitor Grok rate limits (Fast/Expert/Heavy pools)
 // @match        https://grok.com/*
 // @grant        GM_addStyle
 // @supportURL   https://github.com/BlueSkyXN/GPT-Models-Plus
@@ -19,15 +19,11 @@
 
     // 所有需要查询的模型，key 用作内部标识
     // grok-3 有 4 种 requestKind，grok-4 系列只用 DEFAULT
-    // 别名 modelName 与内部名等价：fast=grok-3, expert=grok-4, heavy=grok-4-heavy
+    // 实测限额池只有 3 个：Fast / Expert / Heavy
     const QUERY_LIST = [
-        { key: 'fast-default',    label: 'Fast',      modelName: 'fast',                             requestKind: 'DEFAULT' },
-        { key: 'fast-reason',     label: 'Fast思考',   modelName: 'fast',                             requestKind: 'REASONING' },
-        { key: 'fast-search',     label: 'Fast搜索',   modelName: 'fast',                             requestKind: 'DEEPSEARCH' },
-        { key: 'fast-deepsearch', label: 'Fast深搜',   modelName: 'fast',                             requestKind: 'DEEPERSEARCH' },
-        { key: 'expert',          label: 'Expert',     modelName: 'expert',                           requestKind: 'DEFAULT' },
-        { key: 'heavy',           label: 'Heavy',      modelName: 'heavy',                            requestKind: 'DEFAULT' },
-        { key: 'auto',            label: 'Auto',       modelName: 'grok-4-auto',                     requestKind: 'DEFAULT' },
+        { key: 'fast',    label: 'Fast',    modelName: 'fast',    requestKind: 'DEFAULT' },
+        { key: 'expert',  label: 'Expert',  modelName: 'expert',  requestKind: 'DEFAULT' },
+        { key: 'heavy',   label: 'Heavy',   modelName: 'heavy',   requestKind: 'DEFAULT' },
     ];
 
     // ========== 样式 ==========
@@ -227,16 +223,7 @@
         const details = document.createElement('div');
         details.className = 'grok-monitor-details';
 
-        let lastGroup = '';
         QUERY_LIST.forEach((q, i) => {
-            const group = q.modelName.startsWith('grok-3') ? 'grok3' : 'grok4';
-            if (lastGroup && group !== lastGroup) {
-                const sep = document.createElement('hr');
-                sep.className = 'grok-monitor-separator';
-                details.appendChild(sep);
-            }
-            lastGroup = group;
-
             const row = document.createElement('div');
             row.className = 'grok-monitor-row';
             const labelSpan = document.createElement('span');
