@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Grok Helper
 // @namespace    https://github.com/BlueSkyXN/GPT-Models-Plus
-// @version      0.1.2
+// @version      1.0.0
 // @author       BlueSkyXN
-// @description  Monitor Grok API rate limits (标3, 思考, 搜索, 深搜, 标4), show summary + detail on hover
+// @description  Monitor Grok rate limits for all models (Fast/Expert/Heavy/Auto/4Fast/4.1 + Grok-3 modes)
 // @match        https://grok.com/*
 // @grant        GM_addStyle
 // @supportURL   https://github.com/BlueSkyXN/GPT-Models-Plus
@@ -15,23 +15,30 @@
 (function() {
     'use strict';
 
-    // 四种模式 -> 简短显示标签对应表（Grok-3）
-    const MODE_LABELS = {
-        DEFAULT: '标3',
-        REASONING: '思考',
-        DEEPSEARCH: '搜索',
-        DEEPERSEARCH: '深搜'
-    };
+    // ========== 模型与查询配置 ==========
 
-    // 我们需要查询的四种模式（Grok-3）
-    const REQUEST_KINDS = Object.keys(MODE_LABELS);
+    // 所有需要查询的模型，key 用作内部标识
+    // grok-3 有 4 种 requestKind，grok-4 系列只用 DEFAULT
+    // 别名 modelName 与内部名等价：fast=grok-3, expert=grok-4, heavy=grok-4-heavy
+    const QUERY_LIST = [
+        { key: 'fast-default',    label: 'Fast',      modelName: 'fast',                             requestKind: 'DEFAULT' },
+        { key: 'fast-reason',     label: 'Fast思考',   modelName: 'fast',                             requestKind: 'REASONING' },
+        { key: 'fast-search',     label: 'Fast搜索',   modelName: 'fast',                             requestKind: 'DEEPSEARCH' },
+        { key: 'fast-deepsearch', label: 'Fast深搜',   modelName: 'fast',                             requestKind: 'DEEPERSEARCH' },
+        { key: 'expert',          label: 'Expert',     modelName: 'expert',                           requestKind: 'DEFAULT' },
+        { key: 'heavy',           label: 'Heavy',      modelName: 'heavy',                            requestKind: 'DEFAULT' },
+        { key: 'grok4-fast',      label: '4Fast',      modelName: 'grok-4-mini-thinking-tahoe',      requestKind: 'DEFAULT' },
+        { key: 'auto',            label: 'Auto',       modelName: 'grok-4-auto',                     requestKind: 'DEFAULT' },
+        { key: 'grok41',          label: 'Grok4.1',    modelName: 'grok-4-1-non-thinking-w-tool',    requestKind: 'DEFAULT' },
+    ];
 
-    // 添加自定义样式
+    // ========== 样式 ==========
+
     GM_addStyle(`
         .grok-monitor {
             position: fixed;
             right: 16px;
-            top: 72px; /* 位于 logo 下方 */
+            top: 72px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 14px;
             z-index: 100;
@@ -40,21 +47,20 @@
             align-items: flex-start;
             padding: 8px 12px;
             gap: 8px;
-            border: 1px solid #ccc;          /* 灰色圆角线始终显示 */
+            border: 1px solid #ccc;
             border-radius: 8px;
-            background-color: #fff;          /* 背景白色，可按需改 */
+            background-color: #fff;
             color: #1a1a1a;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* 轻微投影，可选 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             transition: all 0.2s ease;
             opacity: 0.9;
+            max-height: 40px;
+            overflow: hidden;
         }
-
-        /* 悬浮时增加不透明度 */
         .grok-monitor:hover {
             opacity: 1;
+            max-height: 600px;
         }
-
-        /* 小版本：只显示总结行 */
         .grok-monitor-summary {
             display: flex;
             align-items: center;
@@ -62,9 +68,8 @@
             white-space: nowrap;
             font-weight: 500;
             font-size: 14px;
+            cursor: pointer;
         }
-
-        /* 指示灯 */
         .grok-monitor-indicator {
             width: 12px;
             height: 12px;
@@ -72,316 +77,226 @@
             flex-shrink: 0;
             transition: background-color 0.2s ease;
         }
-
-        /* 大版本：详细行，默认隐藏，悬浮时显示 */
         .grok-monitor-details {
-            display: none;        /* 默认隐藏 */
+            display: none;
             flex-direction: column;
             gap: 4px;
             font-size: 13px;
         }
-
-        /* 悬浮时让 details 显示 */
         .grok-monitor:hover .grok-monitor-details {
             display: flex;
         }
-
-        .grok-monitor-kind-row {
+        .grok-monitor-row {
             display: flex;
             align-items: center;
             gap: 6px;
             white-space: nowrap;
         }
-
-        .grok-monitor-kind-name {
+        .grok-monitor-row-label {
             font-weight: 600;
+            min-width: 60px;
         }
-
-        /* 更新动画（请求中时可以使用） */
+        .grok-monitor-separator {
+            border: none;
+            border-top: 1px dashed #ddd;
+            margin: 2px 0;
+            width: 100%;
+        }
         .grok-monitor.updating .grok-monitor-indicator {
-            animation: pulse 1s ease-in-out infinite;
+            animation: grok-pulse 1s ease-in-out infinite;
         }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.2);
-                opacity: 0.7;
-            }
+        @keyframes grok-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
         }
-
-        /* 深色模式下可自行调整 */
         @media (prefers-color-scheme: dark) {
             .grok-monitor {
                 background-color: #2b2b2b;
                 color: #fff;
                 border-color: #666;
             }
+            .grok-monitor-separator { border-top-color: #555; }
         }
     `);
 
-    // 工具函数：格式化等待时间
-    function formatWaitTime(seconds) {
-        if (seconds <= 0) return '0m';
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        if (hours > 0 && minutes > 0) {
-            return `${hours}h${minutes}m`;
-        } else if (hours > 0) {
-            return `${hours}h`;
-        } else {
-            return `${minutes}m`;
-        }
-    }
+    // ========== 工具函数 ==========
 
-    // 工具函数：格式化周期窗口
     function formatWindow(seconds) {
-        if (typeof seconds !== 'number' || seconds <= 0) return '未知';
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        if (hours > 0 && minutes > 0) {
-            return `${hours}H${minutes}M`;
-        } else if (hours > 0) {
-            return `${hours}H`;
-        } else {
-            return `${minutes}M`;
+        if (typeof seconds !== 'number' || seconds <= 0) return '?';
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        if (h > 0 && m > 0) return `${h}H${m}M`;
+        if (h > 0) return `${h}H`;
+        return `${m}M`;
+    }
+
+    function formatWait(seconds) {
+        if (typeof seconds !== 'number' || seconds <= 0) return '';
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return m > 0 ? ` 等${m}m${s > 0 ? s + 's' : ''}` : ` 等${s}s`;
+    }
+
+    // ========== API 请求 ==========
+
+    async function fetchRateLimit(modelName, requestKind) {
+        try {
+            const resp = await fetch('/rest/rate-limits', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requestKind, modelName }),
+                credentials: 'include'
+            });
+            if (resp.ok) return await resp.json();
+            return { __error: true, status: resp.status };
+        } catch (e) {
+            return { __error: true, status: 0, message: String(e) };
         }
     }
 
-    // 创建监控器UI
+    async function fetchAll() {
+        const tasks = QUERY_LIST.map(q =>
+            fetchRateLimit(q.modelName, q.requestKind).then(res => ({ key: q.key, res }))
+        );
+        const results = {};
+        (await Promise.all(tasks)).forEach(({ key, res }) => { results[key] = res; });
+        return results;
+    }
+
+    // ========== 格式化单条结果为文本 ==========
+
+    function formatResult(data) {
+        if (!data || data.__error) {
+            const code = data?.status || '-';
+            return `失败(${code})`;
+        }
+
+        const win = formatWindow(data.windowSizeSeconds);
+        const hasHigh = data.highEffortRateLimits != null;
+        const hasLow  = data.lowEffortRateLimits != null;
+
+        // Auto 双路模式
+        if (hasHigh && hasLow) {
+            const hRem = data.highEffortRateLimits.remainingQueries ?? '?';
+            const lRem = data.lowEffortRateLimits.remainingQueries ?? '?';
+            const hWait = formatWait(data.highEffortRateLimits.waitTimeSeconds);
+            const lWait = formatWait(data.lowEffortRateLimits.waitTimeSeconds);
+            return `高${hRem}${hWait} 低${lRem}${lWait} (${win})`;
+        }
+
+        // 单路模式
+        const rem = data.remainingQueries ?? '?';
+        const tot = data.totalQueries ?? '?';
+        const wait = formatWait(data.waitTimeSeconds);
+        let text = `${rem}/${tot}${wait} (${win})`;
+        // 部分模型额外返回 token 桶信息
+        if (typeof data.remainingTokens === 'number') {
+            text += ` T:${data.remainingTokens}/${data.totalTokens ?? '?'}`;
+        }
+        return text;
+    }
+
+    // 从结果中提取剩余可用次数（用于总数汇总）
+    function extractRemaining(data) {
+        if (!data || data.__error) return 0;
+        if (data.highEffortRateLimits != null || data.lowEffortRateLimits != null) {
+            const h = data.highEffortRateLimits?.remainingQueries ?? 0;
+            const l = data.lowEffortRateLimits?.remainingQueries ?? 0;
+            return Math.max(h, 0) + Math.max(l, 0);
+        }
+        return Math.max(data.remainingQueries ?? 0, 0);
+    }
+
+    // ========== UI ==========
+
     function createMonitor() {
         const monitor = document.createElement('div');
         monitor.className = 'grok-monitor';
 
-        // ---- 小版本（默认显示） ----
-        const summaryRow = document.createElement('div');
-        summaryRow.className = 'grok-monitor-summary';
-
-        // 剩余次数总和文本
-        const sumSpan = document.createElement('span');
-        sumSpan.textContent = '剩余总数: ...';
-
-        // 指示灯
+        // 摘要行
+        const summary = document.createElement('div');
+        summary.className = 'grok-monitor-summary';
+        const sumText = document.createElement('span');
+        sumText.id = 'grok-mon-sum';
+        sumText.textContent = '加载中...';
         const indicator = document.createElement('div');
         indicator.className = 'grok-monitor-indicator';
+        indicator.id = 'grok-mon-ind';
+        summary.appendChild(sumText);
+        summary.appendChild(indicator);
 
-        summaryRow.appendChild(sumSpan);
-        summaryRow.appendChild(indicator);
-
-        // ---- 大版本（悬浮后展开） ----
+        // 详情区
         const details = document.createElement('div');
         details.className = 'grok-monitor-details';
 
-        // 为每种模式添加一行
-        REQUEST_KINDS.forEach(kind => {
+        let lastGroup = '';
+        QUERY_LIST.forEach((q, i) => {
+            const group = q.modelName.startsWith('grok-3') ? 'grok3' : 'grok4';
+            if (lastGroup && group !== lastGroup) {
+                const sep = document.createElement('hr');
+                sep.className = 'grok-monitor-separator';
+                details.appendChild(sep);
+            }
+            lastGroup = group;
+
             const row = document.createElement('div');
-            row.className = 'grok-monitor-kind-row';
-
-            // 简短名称
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'grok-monitor-kind-name';
-            nameSpan.textContent = MODE_LABELS[kind];
-
-            // 剩余/等待 文本
+            row.className = 'grok-monitor-row';
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'grok-monitor-row-label';
+            labelSpan.textContent = q.label;
             const infoSpan = document.createElement('span');
+            infoSpan.id = `grok-mon-${q.key}`;
             infoSpan.textContent = '...';
-
-            row.appendChild(nameSpan);
+            row.appendChild(labelSpan);
             row.appendChild(infoSpan);
             details.appendChild(row);
         });
 
-    // 添加 Grok-4 标准模式
-    const grok4Row = document.createElement('div');
-    grok4Row.className = 'grok-monitor-kind-row';
-
-    const grok4NameSpan = document.createElement('span');
-    grok4NameSpan.className = 'grok-monitor-kind-name';
-    grok4NameSpan.textContent = '标4';
-
-    const grok4InfoSpan = document.createElement('span');
-    grok4InfoSpan.textContent = '...';
-
-    grok4Row.appendChild(grok4NameSpan);
-    grok4Row.appendChild(grok4InfoSpan);
-    details.appendChild(grok4Row);
-
-    // 组装
-        monitor.appendChild(summaryRow);
+        monitor.appendChild(summary);
         monitor.appendChild(details);
-
         document.body.appendChild(monitor);
-        return monitor;
     }
 
-    // 获取当前域名的基础URL
-    function getBaseUrl() {
-        return window.location.origin;
-    }
-
-    // 获取每种模式的限额（支持传入模型名，默认 grok-3）
-    async function fetchRateLimit(kind, modelName = "grok-3") {
-        try {
-            // 使用动态的基础URL
-            const baseUrl = getBaseUrl();
-            const response = await fetch(`${baseUrl}/rest/rate-limits`, {
-                method: 'POST',
-                headers: {
-                    'accept': '*/*',
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                    requestKind: kind,
-                    modelName: modelName
-                }),
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                return await response.json();
-            } else {
-                const text = await response.text().catch(() => '');
-                const err = { __error: true, status: response.status, statusText: response.statusText, body: text };
-                console.error('Rate limit non-OK:', kind, modelName, err);
-                return err;
-            }
-        } catch (error) {
-            console.error('Rate limit check failed:', kind, modelName, error);
-            return { __error: true, status: 0, statusText: 'NETWORK', message: String(error && error.message || error) };
-        }
-    }
-
-    // 一次获取所有模式数据（grok-3 全部 + grok-4 标准）
-    async function getAllRateLimits() {
-        const tasks = [];
-        // Grok-3 四种
-        for (const kind of REQUEST_KINDS) {
-            tasks.push(
-                fetchRateLimit(kind, 'grok-3').then(res => ({ key: `grok-3-${kind}`, res }))
-            );
-        }
-        // Grok-4 标准
-        tasks.push(
-            fetchRateLimit('DEFAULT', 'grok-4').then(res => ({ key: 'grok-4-DEFAULT', res }))
-        );
-
-        const settled = await Promise.all(tasks);
-        const results = {};
-        settled.forEach(({ key, res }) => { results[key] = res; });
-        return results;
-    }
-
-    // 更新UI
     function updateUI(results) {
+        const sumText = document.getElementById('grok-mon-sum');
+        const indicator = document.getElementById('grok-mon-ind');
         const monitor = document.querySelector('.grok-monitor');
-        const sumSpan = monitor.querySelector('.grok-monitor-summary span');
-        const indicator = monitor.querySelector('.grok-monitor-indicator');
 
-        // 给指示灯加 "updating" 动画效果
         monitor.classList.add('updating');
 
-        // 计算合计剩余次数：若有分级，仅统计 low（按固定比例 4），否则退回 remainingQueries
-        let sum = 0;
-        Object.values(results).forEach(data => {
-            if (!data) return;
-            if (data.__error) return; // 忽略错误项
-            const low = data.lowEffortRateLimits?.remainingQueries ?? 0;
-            if (low || data.lowEffortRateLimits || data.highEffortRateLimits) {
-                sum += low > 0 ? low : 0;
-            } else if (typeof data.remainingQueries === 'number') {
-                sum += data.remainingQueries > 0 ? data.remainingQueries : 0;
-            }
+        let totalRemaining = 0;
+
+        QUERY_LIST.forEach(q => {
+            const data = results[q.key];
+            const el = document.getElementById(`grok-mon-${q.key}`);
+            if (el) el.textContent = formatResult(data);
+            totalRemaining += extractRemaining(data);
         });
 
-        // 小版本文本：合计剩余
-        sumSpan.textContent = `剩余总数: ${sum}`;
+        sumText.textContent = `剩余总数: ${totalRemaining}`;
 
-        // 指示灯颜色
-        if (sum === 0) {
-            indicator.style.backgroundColor = '#EF4444'; // 红色
-        } else if (sum > 0 && sum < 10) {
-            indicator.style.backgroundColor = '#F59E0B'; // 黄色
+        if (totalRemaining === 0) {
+            indicator.style.backgroundColor = '#EF4444';
+        } else if (totalRemaining < 15) {
+            indicator.style.backgroundColor = '#F59E0B';
         } else {
-            indicator.style.backgroundColor = '#10B981'; // 绿色
+            indicator.style.backgroundColor = '#10B981';
         }
 
-        // 更新大版本详细数据
-        const detailRows = monitor.querySelectorAll('.grok-monitor-kind-row');
-        detailRows.forEach(row => {
-            const label = row.querySelector('.grok-monitor-kind-name').textContent;
-            const infoSpan = row.querySelector('span:nth-child(2)');
-
-            let data = null;
-
-            // 根据标签确定对应的数据
-            if (label === '标4') {
-                data = results['grok-4-DEFAULT'];
-            } else {
-                // 查找对应的模式
-                const kind = Object.keys(MODE_LABELS).find(k => MODE_LABELS[k] === label);
-                if (kind) {
-                    data = results[`grok-3-${kind}`];
-                }
-            }
-
-            if (!data) {
-                infoSpan.textContent = '获取失败';
-                return;
-            }
-
-            if (data.__error) {
-                const code = typeof data.status === 'number' ? data.status : '-';
-                const txt = data.statusText || 'ERROR';
-                infoSpan.textContent = `失败: ${code} ${txt}`;
-                return;
-            }
-
-            const low = data.lowEffortRateLimits?.remainingQueries ?? null;
-            const hasTiered = (low !== null) || (data.highEffortRateLimits != null);
-            const windowText = formatWindow(data.windowSizeSeconds);
-
-            // 先尝试 tokens 的余/总（能提供总数）
-            const tokenRem = typeof data.remainingTokens === 'number' ? data.remainingTokens : null;
-            const tokenTot = typeof data.totalTokens === 'number' ? data.totalTokens : null;
-
-            if (hasTiered) {
-                const rem = tokenRem ?? (typeof low === 'number' ? low : null);
-                const tot = tokenTot ?? (typeof data.totalQueries === 'number' ? data.totalQueries : null);
-                const remText = rem !== null ? rem : '?';
-                const totText = tot !== null ? tot : '?';
-                infoSpan.textContent = `${remText}/${totText} (${windowText})`;
-                return;
-            }
-
-            const qRem = typeof data.remainingQueries === 'number' ? data.remainingQueries : null;
-            const qTot = typeof data.totalQueries === 'number' ? data.totalQueries : null;
-            if (qRem !== null || qTot !== null) {
-                const remText = qRem !== null ? qRem : '?';
-                const totText = qTot !== null ? qTot : '?';
-                infoSpan.textContent = `${remText}/${totText} (${windowText})`;
-            } else {
-                infoSpan.textContent = `?/?:? (${windowText})`;
-            }
-        });
-
-        // 1s 后移除更新动画
         setTimeout(() => monitor.classList.remove('updating'), 1000);
     }
 
-    // 定时检查
-    async function checkRateLimits() {
-        const results = await getAllRateLimits();
+    // ========== 主循环 ==========
+
+    async function tick() {
+        const results = await fetchAll();
         updateUI(results);
     }
 
-    // 初始化
     function init() {
         createMonitor();
-        checkRateLimits(); // 立即检查一次
-        setInterval(checkRateLimits, 30000); // 每 30s 检查
+        tick();
+        setInterval(tick, 30000);
     }
 
     if (document.readyState === 'loading') {
