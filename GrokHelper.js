@@ -27,9 +27,7 @@
         { key: 'fast-deepsearch', label: 'Fast深搜',   modelName: 'fast',                             requestKind: 'DEEPERSEARCH' },
         { key: 'expert',          label: 'Expert',     modelName: 'expert',                           requestKind: 'DEFAULT' },
         { key: 'heavy',           label: 'Heavy',      modelName: 'heavy',                            requestKind: 'DEFAULT' },
-        { key: 'grok4-fast',      label: '4Fast',      modelName: 'grok-4-mini-thinking-tahoe',      requestKind: 'DEFAULT' },
         { key: 'auto',            label: 'Auto',       modelName: 'grok-4-auto',                     requestKind: 'DEFAULT' },
-        { key: 'grok41',          label: 'Grok4.1',    modelName: 'grok-4-1-non-thinking-w-tool',    requestKind: 'DEFAULT' },
     ];
 
     // ========== 样式 ==========
